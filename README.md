@@ -2,7 +2,10 @@
 Life is short, you shouldn't type so much when interacting with s3 buckets
 
 ### Requirements
-NOTE: To use this package you need to already have aws.cli installed and configured on your machine. If you are interacting with a private bucket this'll include configuring your credentials. If you set the default credentials (without specifying a --profile) s3r doesn't need a profile name set.
+To use this package you need to already have [aws.cli](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) installed and configured on your machine. If you are interacting with a private bucket this'll include configuring your credentials. If you set the default credentials (without specifying a --profile) s3r doesn't need a profile name set.
+
+> big caveat, I'll only be testing this package initially on amazon linux and ubuntu, so usage on windows or osx at your own risk.
+
 ```
 bash> aws s3 configure -profile cred1
 ```
