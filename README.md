@@ -1,5 +1,5 @@
 # s3r
-Life is short, you shouldn't need to type so much when interacting with s3 buckets
+Life is short, you shouldn't type so much when interacting with s3 buckets
 
 ### Requirements
 NOTE: To use this package you need to already have aws.cli installed and configured on your machine. If you are interacting with a private bucket this'll include configuring your credentials. If you set the default credentials (without specifying a --profile) s3r doesn't need a profile name set.
