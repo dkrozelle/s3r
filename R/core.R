@@ -1,3 +1,7 @@
+chomp_slash <- function(x){
+  gsub("^\\/+|\\/+$","",x)
+}
+
 #  -----------------------------------------------------------------------------
 #' Establish an environment which defines the current S3 bucket metadata.
 #'
@@ -14,42 +18,67 @@
 #'
 #' @return print details about current environment
 #' @export
-s3_set_env <- function(bucket  = NULL,
-                       profile = NULL,
-                       cache   = NULL,
-                       sse     = NULL,
-                       wd      = NULL,
-                       aws.args = NULL){
+s3_set <- function(bucket  = NULL,
+                   profile = NULL,
+                   cache   = NULL,
+                   sse     = NULL,
+                   wd      = NULL,
+                   aws.args = NULL){
   # make a new environment in the top environment,
   # this will overwrite any non-environment variables named "e"
   if( !exists("s3e", envir = globalenv()) ) s3e <<- new.env(parent = emptyenv())
-
-  # if set, these variables are appended to all s3 calls  
-  if( !is.null(aws.args) ) s3e$aws.args <- aws.args
   
-  # remove the profile argument if anything other than a non-blank 
+  # profile --------------------------------------------------------------------
+  # 
+  # set the profile argument if anything other than a non-blank 
   # character string is specified
-  if( !is.null(profile) && is.character(profile) && profile != "" ){ 
-    s3e$profile  <- paste("--profile", profile)
-  }else if( !is.null(profile) ){
-    s3e$profile  <- NULL
-    }
   
-  # remove the sse flag if anything other than TRUE is specified
-  if( is.logical(sse )  && sse ){ s3e$sse <- "--sse"
-  }else if( !is.null(sse) ){ s3e$sse <- NULL }
-
-  # format the full bucket string
+  if( !is.null(profile) ){
+    
+    if( is.character(profile) && profile != "" ){
+  
+      profile <- paste('--profile', profile, sep = "=")
+      
+      # check if this profile exists
+      keys.found <- system(paste('aws configure list',
+                                 profile,
+                                 '| grep -e key | wc -l'), intern = T) == 2
+      
+      # check if these keys exist
+      if( keys.found ) {
+        s3e$profile <- profile
+      }else{ 
+        message('Please use \"aws configure --profile=NAME\" to set the',
+                'access key and secret key you\'d like to use')
+      }
+      
+    }else if( exists(s3e$profile) ){ 
+      # remove if profile argument is a blank string
+      rm(s3e$profile)
+      }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  # bucket string --------------------------------------------------------------
   if( !is.null(bucket) ){
     if( grepl("^s3:\\/\\/", bucket) ){
       s3e$bucket <- gsub("^s3:\\/\\/(.*)\\/*", 
-                       "s3://\\1", bucket)  
+                         "s3://\\1", bucket)  
     }else{
       s3e$bucket <- paste0("s3://", bucket)
     }
+    
+    # make sure paths have a trailing file separator
+    s3e$bucket <- paste0(chomp_slash(s3e$bucket), .Platform$file.sep )
   }
   
-  # define a default local cache here. 
+  # local cache ----------------------------------------------------------------
   if( is.null(s3e$cache) ) cache <- "/tmp/s3-cache"
   
   # define local directory to store get/put files
@@ -61,19 +90,44 @@ s3_set_env <- function(bucket  = NULL,
     if( !dir.exists(s3e$cache) ){
       s3e$cache <- NULL
       stop("local cache directory could  not be created")
-      }
+    }
+  }
+  # working directory ----------------------------------------------------------
+  if( !is.null(wd) & !is.null(s3e$bucket) & is.character(wd) ){
+    # coerce to fully qualified path
+    if( startsWith(wd, s3e$bucket) ){
+      s3e$wd <- wd
+    }else{
+      s3e$wd <- file.path(chomp_slash(s3e$bucket), chomp_slash(wd))
+    }
+    
+    s3e$wd <- paste0(chomp_slash(s3e$wd), .Platform$file.sep )
   }
   
-  if( !is.null(wd) ){
-
-  }
- 
-  # print current environment variables
+  # other options --------------------------------------------------------------
+  # remove the sse flag if anything other than TRUE is specified
+  if( is.logical(sse)  && sse ){ s3e$sse <- "--sse"
+  }else if( !is.null(sse) ){ s3e$sse <- NULL }
+  
+  # generic argument strings to be appended to ALL s3 calls
+  # use this for default arguments not explicitly supported by s3r
+  # 
+  # we don't suggest using this for arguments that need to be differentially applied
+  # to copy/move functions as to list/get functions. For example encryption scheme 
+  # arguments passed to list functions cause an error, you should only use where 
+  # appropriate.
+  # 
+  # for options like --dryrun mode we suggest setting these on individual calls
+  # instead of here so they can be quickly removed  after you confirm proper usage
+  if( !is.null(aws.args) ) s3e$aws.args <- aws.args
+  
+  # print current environment variables ----------------------------------------
   if( length(ls(s3e)) > 0 ){
-  knitr::kable(data.table::rbindlist(
-    lapply(ls(s3e), function(x){
-      data.frame(var = x, 
-                 val = s3e[[x]])
-    })
-  ))}
+    knitr::kable(data.table::rbindlist(
+      lapply(ls(s3e), function(x){
+        data.frame(var = as.character(x), 
+                   val = as.character(s3e[[x]]))
+      })
+    ))}
+  
 }
