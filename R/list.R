@@ -10,7 +10,7 @@
 #' @param pattern    character,
 #' @param list.names logical,
 #' @param files.only logical,
-#' @param dir.only   logical,
+#' @param dir.only   logical, NOTE: does not work with recursive = T
 #' @param aws.args   character,
 #' 
 #' @return 
@@ -18,31 +18,52 @@
 s3_ls <- function( ... ,
                    recursive  = FALSE,
                    pattern    = NULL,
-                   list.names = TRUE,
+                   full.names = FALSE,
                    files.only = FALSE,
-                   dir.only   = FALSE,
+                   dir.only   = FALSE, 
+                   all.files  = FALSE,
+                   full.response = FALSE,
+                   
                    aws.args   = NULL){
   
-  # preferentially use passed path argument path
-  if( length(list(...)) > 0){
-    # use defined path, not yet implemented
-    path <- "arg"
-    
-    # append bucket name if necessary
-    # this should be a function
-    
-  }else if( exists("wd", envir = s3e) && !is.null(s3e$wd) ){
-    # use working directory
-    path <- s3e$wd
-  }else if( exists("bucket", envir = s3e) && !is.null(s3e$bucket) ){
-    # use the bucket root
-    path <- s3e$bucket
-  }else {
-    message("path not supplied and default bucket/working directory not defined")
+  # we assume the path supplied is a directory
+  path <- build_uri(..., dir = T)
+  
+  cmd <- paste('aws s3 ls',
+              aws.args,
+              if(recursive) "--recursive",
+              path)
+  
+  resp <- aws_cli(cmd)
+
+  
+  # check the aws response code to confirm success
+  if(system('echo $?', intern = T) != "0"){
+    stop('aws call did not return as expected') }
+  
+  if( full.response ){ 
+    resp
+  }else{
+    # trim date and size info
+    resp <- gsub("^.* ", "", resp) 
+    }
+  
+  
+  if( all.files ){
+    resp 
+  }else{
+    resp <- resp[resp != ""]
   }
   
-  print(paste('aws s3 ls',
-               s3e$aws.args,
-               aws.args,
-               path))
+  if( files.only ){
+    resp <- resp[!endsWith(resp, "/")]
+  }else if( dir.only ){
+    resp <- resp[endsWith(resp, "/")]
+  }
+  
+  if( !is.null(pattern) ) resp <- grep(pattern, resp, value = T)
+  
+  if( full.names )        resp <- file.path(chomp_slash(path), resp)
+  
+  resp
 }
