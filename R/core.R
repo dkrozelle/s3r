@@ -1,7 +1,3 @@
-chomp_slash <- function(x){
-  gsub("^\\/+|\\/+$","",x)
-}
-
 #  -----------------------------------------------------------------------------
 #' Establish an environment which defines the current S3 bucket metadata.
 #'
@@ -11,19 +7,20 @@ chomp_slash <- function(x){
 #' settings without explicitly changing previous settings. 
 #'
 #' @param bucket base name for s3 bucket e.g. "s3://bucket-name" or "bucket-name"
-#' @param wd character string path, optional to define a working prefix
+#' @param cwd character string path, optional to define a working prefix
 #' @param local.cache character string, path of a local scratch directory. This will
 #'                    be placed at /tmp/s3-cache when called the first time if none
 #'                    is specified. 
 #'
 #' @return print details about current environment
 #' @export
-s3_set <- function(bucket  = NULL,
-                   profile = NULL,
-                   cache   = NULL,
-                   sse     = NULL,
-                   wd      = NULL,
-                   aws.args = NULL){
+s3_set <- function(
+  bucket   = 's3r-test-bucket',
+  profile  = 's3r-read-write-user',
+  cache    = NULL,
+  sse      = NULL,
+  cwd      = NULL,
+  aws.args = NULL){
   # make a new environment in the top environment,
   # this will overwrite any non-environment variables named "e"
   if( !exists("s3e", envir = globalenv()) ) s3e <<- new.env(parent = emptyenv())
@@ -34,11 +31,8 @@ s3_set <- function(bucket  = NULL,
   # character string is specified
   
   if( !is.null(profile) ){
-    
     if( is.character(profile) && profile != "" ){
-  
       profile <- paste('--profile', profile, sep = "=")
-      
       # check if this profile exists
       keys.found <- system(paste('aws configure list',
                                  profile,
@@ -55,31 +49,28 @@ s3_set <- function(bucket  = NULL,
     }else if( exists(s3e$profile) ){ 
       # remove if profile argument is a blank string
       rm(s3e$profile)
-      }
+    }
   }
   
   
-  
-  
-  
-  
-  
-  
-  # bucket string --------------------------------------------------------------
+  # bucket  --------------------------------------------------------------
   if( !is.null(bucket) ){
-    if( grepl("^s3:\\/\\/", bucket) ){
-      s3e$bucket <- gsub("^s3:\\/\\/(.*)\\/*", 
-                         "s3://\\1", bucket)  
-    }else{
-      s3e$bucket <- paste0("s3://", bucket)
-    }
     
-    # make sure paths have a trailing file separator
-    s3e$bucket <- paste0(chomp_slash(s3e$bucket), .Platform$file.sep )
+    bucket <- gsub("(?:s3\\:\\/\\/)?([^\\/]*).*$", "s3://\\1", bucket)
+    
+    if( valid_uri(bucket) ){ 
+      # when a new bucket is set, also set the cwd. if a new cwd is defined it
+      # will be reset below.
+      s3e$bucket <- s3e$cwd <- bucket
+      }
+    
+  }else if( !check_vars("bucket") ){
+    message('s3 bucket is a required parameter')
+    return()
   }
   
   # local cache ----------------------------------------------------------------
-  if( is.null(s3e$cache) ) cache <- "/tmp/s3-cache"
+  if( is.null(s3e$cache) ) cache <- "."
   
   # define local directory to store get/put files
   # will attempt to create non-existant directories
@@ -93,21 +84,16 @@ s3_set <- function(bucket  = NULL,
     }
   }
   # working directory ----------------------------------------------------------
-  if( !is.null(wd) & !is.null(s3e$bucket) & is.character(wd) ){
-    # coerce to fully qualified path
-    if( startsWith(wd, s3e$bucket) ){
-      s3e$wd <- wd
-    }else{
-      s3e$wd <- file.path(chomp_slash(s3e$bucket), chomp_slash(wd))
-    }
-    
-    s3e$wd <- paste0(chomp_slash(s3e$wd), .Platform$file.sep )
+  if( !is.null(cwd) & is.character(cwd) ){
+    s3e$cwd <- s3_cd(cwd)
+  }else if( !check_vars("cwd") ){
+    s3e$cwd <- s3_cd()
   }
   
   # other options --------------------------------------------------------------
   # remove the sse flag if anything other than TRUE is specified
   if( is.logical(sse)  && sse ){ s3e$sse <- "--sse"
-  }else if( !is.null(sse) ){ s3e$sse <- NULL }
+  }else if( !is.null(sse) && exists("sse", envir = s3e) ){ rm(sse, envir = s3e) }
   
   # generic argument strings to be appended to ALL s3 calls
   # use this for default arguments not explicitly supported by s3r
@@ -122,12 +108,74 @@ s3_set <- function(bucket  = NULL,
   if( !is.null(aws.args) ) s3e$aws.args <- aws.args
   
   # print current environment variables ----------------------------------------
-  if( length(ls(s3e)) > 0 ){
-    knitr::kable(data.table::rbindlist(
-      lapply(ls(s3e), function(x){
-        data.frame(var = as.character(x), 
-                   val = as.character(s3e[[x]]))
-      })
-    ))}
+  # if( length(ls(s3e)) > 0 ){
+  #   knitr::kable(data.table::rbindlist(
+  #     lapply(ls(s3e), function(x){
+  #       data.frame(var = as.character(x), 
+  #                  val = as.character(s3e[[x]]))
+  #     })
+  #   ))}
+  sapply(ls(s3e), function(x){s3e[[x]]})
+}
+
+
+#' @export
+s3_cd <- function(...){
+  
+  if( !exists("s3e", envir = globalenv()) ){
+    message('please use s3_set() before attempting to set cwd.')
+    return()
+  }
+  
+  # if any arguments, use them to set new cwd
+  if( length(list(...)) > 0 ){
+    # if arguments provided, set new cwd
+    s3e$cwd <- build_uri(...)
+  }else{
+    # otherwise use default build_uri which creates from cwd or bucket
+    s3e$cwd <- build_uri()
+  }
+  
+  # check the cwd exists, aws_cli throws it's own error if does not exist
+  cmd <- paste('aws s3 ls', s3e$cwd)
+  aws_cli(cmd)
+  
+  return(s3e$cwd)
   
 }
+
+# global args and profile are appended to all calls here
+aws_cli <- function(cmd){
+  
+  cmd  <- paste(cmd, s3e$aws.args, s3e$profile)
+  cmd  <- gsub(" +", " ", cmd)
+  resp <- system(cmd, intern = T)
+  resp
+}
+
+# global args and profile are appended to all calls here
+check_vars <- function(...){
+  if( !exists("s3e", envir = globalenv()) ){
+    message('please configure s3_set() before using other functions.')
+    return(FALSE)
+  }
+  
+  if( length(list(...)) > 0 ){ 
+    bool <- sapply(list(...), function(x){
+      exists(x, envir = s3e)
+    })
+    return( all(bool) )
+  }
+  
+}
+
+valid_uri <- function(uri){
+  
+  Reduce("&", list( 
+    grepl("^s3:\\/\\/", uri),     # starts with "s3://"
+    grepl("^[^ ]+$", uri),        # no spaces
+    !grepl("\\/{2}.*\\/{2}", uri) # only one set of double "//"
+  ))
+}
+
+
