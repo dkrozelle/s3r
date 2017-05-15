@@ -1,4 +1,3 @@
-#  -----------------------------------------------------------------------------
 #' List objects in an S3 bucket.
 #'
 #' List the items in an S3 bucket. Lots of time-saving filters are built-in, including
@@ -13,7 +12,7 @@
 #' @param dir.only   logical, NOTE: does not work with recursive = T
 #' @param aws.args   character,
 #' 
-#' @return 
+#' @return character vector of bucket contents
 #' @export
 s3_ls <- function( ... ,
                    recursive  = FALSE,
