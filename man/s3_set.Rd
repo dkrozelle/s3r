@@ -2,10 +2,10 @@
 % Please edit documentation in R/core.R
 \name{s3_set}
 \alias{s3_set}
-\title{Establish an environment which defines the current S3 bucket metadata.}
+\title{Configure s3r environment which stores S3 bucket metadata.}
 \usage{
-s3_set(bucket = NULL, profile = "s3r-read-write-user", cache = NULL,
-  sse = NULL, cwd = NULL, aws.args = NULL)
+s3_set(bucket = "s3r-test-bucket", profile = "s3r-read-write-user",
+  cache = NULL, sse = NULL, cwd = NULL, aws.args = NULL)
 }
 \arguments{
 \item{bucket}{base name for s3 bucket e.g. "s3://bucket-name" or "bucket-name"}
@@ -17,10 +17,10 @@ be placed at /tmp/s3-cache when called the first time if none
 is specified.}
 }
 \value{
-print details about current environment
+list, invisibly returns a list of environment variable settings
 }
 \description{
-This environment is required for all of my S3... functions. Sets bucket name,
+This environment is required for all s3r functions. Sets bucket name,
 defines and creates a local cache directory, tracks working directory. There are
 no default function arguments on purpose, to enable you to call update individual
 settings without explicitly changing previous settings.

@@ -17,11 +17,14 @@ s3_ls(..., recursive = FALSE, pattern = NULL, full.names = FALSE,
 
 \item{files.only}{logical,}
 
-\item{dir.only}{logical,}
+\item{dir.only}{logical, NOTE: does not work with recursive = T}
 
 \item{aws.args}{character,}
 
 \item{list.names}{logical,}
+}
+\value{
+character vector of bucket contents
 }
 \description{
 List the items in an S3 bucket. Lots of time-saving filters are built-in, including
