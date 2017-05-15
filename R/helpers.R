@@ -49,7 +49,7 @@ build_uri <- function(..., dir = F){
 }
 
 chomp_slash <- function(x){
-  gsub("^\\/+|\\/+$","",x)
+  gsub("(.)\\/*$","\\1",x)
 }
 
 relative_path_adjuster <- function(path){
@@ -106,19 +106,16 @@ relative_path_adjustment <- function(path, wd = s3e$cwd){
       message('invalid path, already in at the top of bucket')
       return(1)
     }else{
-      print("..")
-      relative_path_adjustment( path = gsub("^\\.\\.\\/", "", path), wd = dirname(wd))
+      relative_path_adjustment( path = gsub("^\\.\\.\\/*", "", path), wd = dirname(wd))
     }
   }else if( grepl("^\\/.*", path) ){
-    print("/")
     relative_path_adjustment( path = gsub("^\\/", "", path), wd = s3e$bucket)
     
   }else if( grepl("^\\..*", path) ){
-    print(".")
-    relative_path_adjustment( path = gsub("^\\.\\/", "", path), wd = s3e$cwd)
+    relative_path_adjustment( path = gsub("^\\.\\/*", "", path), wd = s3e$cwd)
     
   }else{
-    print("join")
+    
     return(file.path(wd, path))
   }
 }
