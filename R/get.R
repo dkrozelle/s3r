@@ -6,11 +6,11 @@ s3_get_with <- function(..., FUN, fun.args = NULL, aws.args = NULL) {
   
   if( !check_vars("cache") ){
     message('please define a local cache with s3_set(cache = "/tmp") before use')
-    return()
+    return(1)
   } 
   if( length(list(...)) == 0 ){ 
     message('missing required s3 object name (...)')
-    return()
+    return(1)
   }
 
   # define to/from locations
@@ -23,16 +23,17 @@ s3_get_with <- function(..., FUN, fun.args = NULL, aws.args = NULL) {
                aws.args,
                s3.path,
                local.path)
-  resp <- aws_cli(cmd)  
   
-  if( file.exists(local.path) ){
-
-    do.call(FUN, args = c(list(file = local.path), fun.args ))
-    
+  response <- aws_cli(cmd)
+  
+  if( response$code == 0 & file.exists(local.path) ){
+    x <- do.call(FUN, args = c(list(file = local.path), fun.args ))
+    return(x)
   }else{
-    message('unable to write file')
-    return()
+    message('unable to get file')
+    return(1)
   }
+  
 }
 
 #' Download an S3 object to local cache directory.
@@ -43,11 +44,11 @@ s3_get_save <- function(..., aws.args = NULL) {
   
   if( !check_vars("cache") ){
     message('please define a local cache with s3_set(cache = "/tmp") before use')
-    return()
+    return(1)
   } 
   if( length(list(...)) == 0 ){ 
     message('missing required s3 object name (...)')
-    return()
+    return(1)
   }
 
   # define to/from locations
@@ -59,13 +60,14 @@ s3_get_save <- function(..., aws.args = NULL) {
                aws.args,
                s3.path,
                local.path)
-  resp <- aws_cli(cmd)  
   
-  if( file.exists(local.path) ){
-    local.path
+  response <- aws_cli(cmd)
+  
+  if( response$code == 0 & file.exists(local.path) ){
+    return(local.path)
   }else{
-    message('unable to write file')
-    return()
+    message('unable to get file')
+    return(1)
   }
 }
 

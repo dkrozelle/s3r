@@ -122,18 +122,22 @@ s3_cd <- function(...){
   # if any arguments, use them to set new cwd
   if( length(list(...)) > 0 ){
     # if arguments provided, set new cwd
-    s3e$cwd <- build_uri(...)
+    proposed.cwd <- build_uri(...)
   }else{
     # otherwise use default build_uri which creates from cwd or bucket
-    s3e$cwd <- build_uri()
+    proposed.cwd <- build_uri()
   }
   
   # check the cwd exists, aws_cli throws it's own error if does not exist
-  cmd      <- paste('aws s3 ls', s3e$cwd)
-  response <- aws_cli(cmd)
+  response <- aws_cli(paste('aws s3 ls', s3e$cwd))
   
-    return(s3e$cwd)
+  if( response$code == 0 ){
+    s3e$cwd <- proposed.cwd
+  }else{
+    message('unable to set cwd, does this location exist?')
+  }
   
+  s3_ls()
 }
 
 

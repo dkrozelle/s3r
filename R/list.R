@@ -29,40 +29,43 @@ s3_ls <- function( ... ,
   path <- build_uri(..., dir = T)
   
   cmd <- paste('aws s3 ls',
-              aws.args,
-              if(recursive) "--recursive",
-              path)
+               aws.args,
+               if(recursive) "--recursive",
+               path)
   
-  resp <- aws_cli(cmd)
+  response <- aws_cli(cmd)
 
+  if( response$code == 0 ){
+    resp <- response$content
+  }else{
+    message('unable to find requested s3 location')
+    return(1)
+  }
   
-  # check the aws response code to confirm success
-  if(system('echo $?', intern = T) != "0"){
-    stop('aws call did not return as expected') }
-  
+
   if( full.response ){ 
     resp
   }else{
     # trim date and size info
     resp <- gsub("^.* ", "", resp) 
-    }
+  }
   
-  
+
   if( all.files ){
     resp 
   }else{
     resp <- resp[resp != ""]
   }
-  
+
   if( files.only ){
     resp <- resp[!endsWith(resp, "/")]
   }else if( dir.only ){
     resp <- resp[endsWith(resp, "/")]
   }
-  
+
   if( !is.null(pattern) ) resp <- grep(pattern, resp, value = T)
   
   if( full.names )        resp <- file.path(chomp_slash(path), resp)
-  
-  resp
+
+  return(resp)
 }

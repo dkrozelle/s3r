@@ -7,13 +7,13 @@ s3_put_with <- function(x, FUN, ...,
   
   if( !check_vars("cache") ){
     message('please define a local cache with s3_set(cache = "/tmp") before use')
-    return()
+    return(1)
   } 
   if( length(list(...)) == 0 ){ 
     message('missing required s3 object name (...)')
-    return()
+    return(1)
   }
-
+  
   s3.path    <- build_uri(...) 
   local.path <- file.path(s3e$cache, basename(s3.path))
   
@@ -25,14 +25,60 @@ s3_put_with <- function(x, FUN, ...,
                  aws.args,
                  s3e$sse,
                  local.path,
-                 s3.path
-    )
-    resp <- aws_cli(cmd)
-    return(s3.path)
+                 s3.path)
     
+    response <- aws_cli(cmd)
+    
+    if( response$code == 0 ){
+      return(s3.path)
+    }else{
+      message('unable to write file to s3')
+      return(1)
+    }
   }else{
-    message('unable to write file')
-    return()
+    message('unable to write local file')
+    return(1)
+  }
+}
+
+#' Put a local file on S3.
+#'
+#' @return s3 uri
+#' @export
+s3_put_s3 <- function(from, to, aws.args = NULL) {
+  
+  if( is.null(to) | is.null(from) ){
+    message('missing required argument to/from')
+    return(1)
+  }
+  
+  # define to/from locations
+  if( is.list(from) ){
+    local.path <- do.call(file.path, from)
+  }else{
+    local.path <- file.path(from)
+  }
+
+  s3.path    <- build_uri(to) 
+  
+  if( file.exists(local.path) ){
+    cmd <- paste('aws s3 cp',
+                 aws.args,
+                 s3e$sse,
+                 local.path,
+                 s3.path)
+    
+    response <- aws_cli(cmd)
+    
+    if( response$code == 0 ){
+      return(s3.path)
+    }else{
+      message('unable to write file to s3')
+      return(1)
+    }
+  }else{
+    message('unable to write local file')
+    return(1)
   }
 }
 

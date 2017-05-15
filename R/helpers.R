@@ -10,16 +10,18 @@ build_uri <- function(..., dir = F){
   # if no ... and has cwd, use cwd
   # else warning
   
-  new.path <- ( length(list(...) ) > 0 )
+  if( length(list(...) ) == 0 ){
+    path <- NA
+  }else if( length(list(...)) > 1 ){
+    path <- file.path(...)
+    
+  }else{
+    path <- do.call(file.path, as.list(...))
+  }
   
-  # always prefer the provided path over cwd
-  if( new.path ){
-    # TODO: chomp each argument before passing on to file.path
-    path <- file.path( ... ) }
-  
-  if( new.path && startsWith(path, "s3://") ){
+  if( !is.na(path) && startsWith(path, "s3://") ){
     path <- path
-  }else if( new.path && check_vars("cwd") ){
+  }else if( !is.na(path) && check_vars("cwd") ){
     path <- file.path(chomp_slash(s3e$cwd), chomp_slash(path))
   }else if( check_vars("cwd") ){
     path <- chomp_slash(s3e$cwd)
@@ -54,13 +56,14 @@ relative_path_adjuster <- function(path){
 aws_cli <- function(cmd){
   cmd  <- paste(cmd, s3e$aws.args, s3e$profile)
   cmd  <- gsub(" +", " ", cmd)
-  response <- list(content = system(cmd, intern = T),
-                   code    = system('echo $?'))
+  response <- list(content = system(cmd,       intern = T),
+                   code    = system('echo $?', intern = T))
   
   if( response$code == 0 ){
-    return(response$content)
+    return(response)
   }else{
     message(paste('aws error code:', response$code))
+    return(response)
   }
 }
 
@@ -75,6 +78,8 @@ check_vars <- function(...){
       exists(x, envir = s3e)
     })
     return( all(bool) )
+  }else{
+    return(FALSE)
   }
   
 }
