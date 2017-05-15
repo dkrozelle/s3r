@@ -17,7 +17,7 @@ build_uri <- function(..., dir = F){
     # TODO: chomp each argument before passing on to file.path
     path <- file.path( ... ) }
   
-  if( new.path && startsWith(path, "s3://") ){
+  if( new.path && grepl("^s3:\\/\\/", path) ){
     path <- path
   }else if( new.path && check_vars("cwd") ){
     path <- file.path(chomp_slash(s3e$cwd), chomp_slash(path))
