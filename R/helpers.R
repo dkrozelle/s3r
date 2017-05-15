@@ -17,8 +17,9 @@ build_uri <- function(..., dir = F){
   }else{
     path <- do.call(file.path, as.list(...))
   }
-  
-  if( !is.na(path) && startsWith(path, "s3://") ){
+
+  if( new.path && grepl("^s3:\\/\\/", path) ){
+
     path <- path
   }else if( !is.na(path) && check_vars("cwd") ){
     path <- relative_path_adjustment(path)
