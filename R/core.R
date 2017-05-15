@@ -1,7 +1,6 @@
-#  -----------------------------------------------------------------------------
-#' Establish an environment which defines the current S3 bucket metadata.
+#' Configure s3r environment which stores S3 bucket metadata.
 #'
-#' This environment is required for all of my S3... functions. Sets bucket name,
+#' This environment is required for all s3r functions. Sets bucket name,
 #' defines and creates a local cache directory, tracks working directory. There are
 #' no default function arguments on purpose, to enable you to call update individual
 #' settings without explicitly changing previous settings. 
@@ -12,7 +11,7 @@
 #'                    be placed at /tmp/s3-cache when called the first time if none
 #'                    is specified. 
 #'
-#' @return print details about current environment
+#' @return list, invisibly returns a list of environment variable settings
 #' @export
 s3_set <- function(
   bucket   = 's3r-test-bucket',
@@ -21,8 +20,7 @@ s3_set <- function(
   sse      = NULL,
   cwd      = NULL,
   aws.args = NULL){
-  # make a new environment in the top environment,
-  # this will overwrite any non-environment variables named "e"
+  
   if( !exists("s3e", envir = globalenv()) ) s3e <<- new.env(parent = emptyenv())
   
   # profile --------------------------------------------------------------------
@@ -62,7 +60,7 @@ s3_set <- function(
       # when a new bucket is set, also set the cwd. if a new cwd is defined it
       # will be reset below.
       s3e$bucket <- s3e$cwd <- bucket
-      }
+    }
     
   }else if( !check_vars("bucket") ){
     message('s3 bucket is a required parameter')
@@ -107,18 +105,12 @@ s3_set <- function(
   # instead of here so they can be quickly removed  after you confirm proper usage
   if( !is.null(aws.args) ) s3e$aws.args <- aws.args
   
-  # print current environment variables ----------------------------------------
-  # if( length(ls(s3e)) > 0 ){
-  #   knitr::kable(data.table::rbindlist(
-  #     lapply(ls(s3e), function(x){
-  #       data.frame(var = as.character(x), 
-  #                  val = as.character(s3e[[x]]))
-  #     })
-  #   ))}
-  sapply(ls(s3e), function(x){s3e[[x]]})
+
+  invisible(sapply(ls(s3e), function(x){s3e[[x]]}))
 }
 
-
+#' Set the current working directory on S3
+#' @return returns the new cwd value
 #' @export
 s3_cd <- function(...){
   
@@ -137,45 +129,12 @@ s3_cd <- function(...){
   }
   
   # check the cwd exists, aws_cli throws it's own error if does not exist
-  cmd <- paste('aws s3 ls', s3e$cwd)
-  aws_cli(cmd)
+  cmd      <- paste('aws s3 ls', s3e$cwd)
+  response <- aws_cli(cmd)
   
-  return(s3e$cwd)
-  
-}
-
-# global args and profile are appended to all calls here
-aws_cli <- function(cmd){
-  
-  cmd  <- paste(cmd, s3e$aws.args, s3e$profile)
-  cmd  <- gsub(" +", " ", cmd)
-  resp <- system(cmd, intern = T)
-  resp
-}
-
-# global args and profile are appended to all calls here
-check_vars <- function(...){
-  if( !exists("s3e", envir = globalenv()) ){
-    message('please configure s3_set() before using other functions.')
-    return(FALSE)
-  }
-  
-  if( length(list(...)) > 0 ){ 
-    bool <- sapply(list(...), function(x){
-      exists(x, envir = s3e)
-    })
-    return( all(bool) )
-  }
+    return(s3e$cwd)
   
 }
 
-valid_uri <- function(uri){
-  
-  Reduce("&", list( 
-    grepl("^s3:\\/\\/", uri),     # starts with "s3://"
-    grepl("^[^ ]+$", uri),        # no spaces
-    !grepl("\\/{2}.*\\/{2}", uri) # only one set of double "//"
-  ))
-}
 
 

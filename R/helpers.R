@@ -1,13 +1,3 @@
-#  -----------------------------------------------------------------------------
-#' Build an S3 uri
-#'
-#' Internal function to quick ly generate fully formed uris from partial
-#' uri fragments.
-#'
-#' @param ...  components of a uri that you'd like to build
-#' 
-#' @return character string uri
-#' @export
 build_uri <- function(..., dir = F){
   if( !"s3e" %in% ls(envir = globalenv()) ){ 
     message('please use s3_set() before use.')
@@ -57,9 +47,42 @@ chomp_slash <- function(x){
   gsub("^\\/+|\\/+$","",x)
 }
 
-relative_path_adjuster <- function(){
+relative_path_adjuster <- function(path){
+  path
+}
+
+aws_cli <- function(cmd){
+  cmd  <- paste(cmd, s3e$aws.args, s3e$profile)
+  cmd  <- gsub(" +", " ", cmd)
+  response <- list(content = system(cmd, intern = T),
+                   code    = system('echo $?'))
+  
+  if( response$code == 0 ){
+    return(response$content)
+  }else{
+    message(paste('aws error code:', response$code))
+  }
+}
+
+check_vars <- function(...){
+  if( !exists("s3e", envir = globalenv()) ){
+    message('please configure s3_set() before using other functions.')
+    return(FALSE)
+  }
+  
+  if( length(list(...)) > 0 ){ 
+    bool <- sapply(list(...), function(x){
+      exists(x, envir = s3e)
+    })
+    return( all(bool) )
+  }
   
 }
 
-
-
+valid_uri <- function(uri){
+  Reduce("&", list( 
+    grepl("^s3:\\/\\/", uri),     # starts with "s3://"
+    grepl("^[^ ]+$", uri),        # no spaces
+    !grepl("\\/{2}.*\\/{2}", uri) # only one set of double "//"
+  ))
+}
