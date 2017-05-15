@@ -68,7 +68,7 @@ s3_set <- function(
   }
   
   # local cache ----------------------------------------------------------------
-  if( is.null(s3e$cache) ) cache <- "."
+  if( is.null(s3e$cache) && is.null(cache)) cache <- "."
   
   # define local directory to store get/put files
   # will attempt to create non-existant directories
