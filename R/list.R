@@ -5,7 +5,10 @@
 #' all functions i nthis package, you must first define your environment with s3_set().
 #'
 #' @param ...  
-#' @param recursive  logical, 
+#' @param recursive  logical, when enabled lists all files under the defined 
+#' directory. Currently the return is not optimal, and returns a root-based path 
+#' independent of cwd. For example: cwd=s3"//bucket/one/two/three/ will return
+#' s3_ls(".") as "one/two/three/file.txt" instead of the expected "file.txt"
 #' @param pattern    character,
 #' @param list.names logical,
 #' @param files.only logical,
@@ -32,7 +35,7 @@ s3_ls <- function( ... ,
                aws.args,
                if(recursive) "--recursive",
                path)
-  
+  print(cmd)
   response <- aws_cli(cmd)
 
   if( response$code == 0 ){

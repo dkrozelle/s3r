@@ -11,7 +11,10 @@ s3_ls(..., recursive = FALSE, pattern = NULL, full.names = FALSE,
 \arguments{
 \item{...}{}
 
-\item{recursive}{logical,}
+\item{recursive}{logical, when enabled lists all files under the defined 
+directory. Currently the return is not optimal, and returns a root-based path 
+independent of cwd. For example: cwd=s3"//bucket/one/two/three/ will return
+s3_ls(".") as "one/two/three/file.txt" instead of the expected "file.txt"}
 
 \item{pattern}{character,}
 
