@@ -1,20 +1,19 @@
 build_uri <- function(..., dir = F){
   if( !"s3e" %in% ls(envir = globalenv()) ){ 
     message('please use s3_set() before use.')
-    return()
-  }
-  
+    return() }
+
   # logic
   # if ... argument used and starts with s3, use it
   # if ... argument used and has cwd, add cwd
   # if no ... and has cwd, use cwd
   # else warning
   
+  # combine path elements, should accept separate objects, list, or a character vector
   if( length(list(...) ) == 0 ){
     path <- NA
   }else if( length(list(...)) > 1 ){
     path <- file.path(...)
-    
   }else{
     path <- do.call(file.path, as.list(...))
   }
@@ -22,12 +21,15 @@ build_uri <- function(..., dir = F){
   if( !is.na(path) && startsWith(path, "s3://") ){
     path <- path
   }else if( !is.na(path) && check_vars("cwd") ){
-    path <- file.path(chomp_slash(s3e$cwd), chomp_slash(path))
+    path <- relative_path_adjustment(path)
+    
+    if( path == 1 ){return(1)}
+    
   }else if( check_vars("cwd") ){
     path <- chomp_slash(s3e$cwd)
   }else{
     message("path not supplied and default bucket/working directory not defined")
-    return()
+    return(1)
   }
   
   # add terminal slash if dir = T
@@ -37,6 +39,7 @@ build_uri <- function(..., dir = F){
     uri <- chomp_slash(path)
   }
   
+  # check before returning
   if( valid_uri(uri) ){ 
     return(uri)
   }else{
@@ -90,4 +93,32 @@ valid_uri <- function(uri){
     grepl("^[^ ]+$", uri),        # no spaces
     !grepl("\\/{2}.*\\/{2}", uri) # only one set of double "//"
   ))
+}
+
+relative_path_adjustment <- function(path, wd = s3e$cwd){
+  
+  wd   <- chomp_slash(wd)
+  path <- chomp_slash(path)
+  
+  if( grepl("^\\.\\..*", path) ){
+    # make sure you have a higher directory
+    if( wd == s3e$bucket ){
+      message('invalid path, already in at the top of bucket')
+      return(1)
+    }else{
+      print("..")
+      relative_path_adjustment( path = gsub("^\\.\\.\\/", "", path), wd = dirname(wd))
+    }
+  }else if( grepl("^\\/.*", path) ){
+    print("/")
+    relative_path_adjustment( path = gsub("^\\/", "", path), wd = s3e$bucket)
+    
+  }else if( grepl("^\\..*", path) ){
+    print(".")
+    relative_path_adjustment( path = gsub("^\\.\\/", "", path), wd = s3e$cwd)
+    
+  }else{
+    print("join")
+    return(file.path(wd, path))
+  }
 }
