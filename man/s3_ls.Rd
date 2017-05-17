@@ -9,22 +9,32 @@ s3_ls(..., recursive = FALSE, pattern = NULL, full.names = FALSE,
   full.response = FALSE, aws.args = NULL)
 }
 \arguments{
-\item{...}{}
+\item{...}{flexible s3 path description of s3 location and object name. This is 
+relative to your cwd (use s3_cd() to print your cwd). Accepts a character 
+vector "top/next", separate character strings c("top", "next"), or 
+lists list("top", "next").}
 
 \item{recursive}{logical, when enabled lists all files under the defined 
 directory. Currently the return is not optimal, and returns a root-based path 
 independent of cwd. For example: cwd=s3"//bucket/one/two/three/ will return
 s3_ls(".") as "one/two/three/file.txt" instead of the expected "file.txt"}
 
-\item{pattern}{character,}
+\item{pattern}{character string pattern to filter results.}
 
-\item{files.only}{logical,}
+\item{full.names}{logical return fully qualified file names.}
 
-\item{dir.only}{logical, NOTE: does not work with recursive = T}
+\item{files.only}{logical filter to show only files}
 
-\item{aws.args}{character,}
+\item{dir.only}{logical filter to show only directories. NOTE: Due to the fact 
+that directories don't actually exist on S3, this won't work with recursive = T}
 
-\item{list.names}{logical,}
+\item{all.files}{logical show unnamed objects ("")}
+
+\item{full.response}{logical list entire metadata string from aws. Includes file
+modified date/time and size.}
+
+\item{aws.args}{character string of any additional values you need appended 
+to this aws.cli command line call.}
 }
 \value{
 character vector of bucket contents
@@ -32,5 +42,5 @@ character vector of bucket contents
 \description{
 List the items in an S3 bucket. Lots of time-saving filters are built-in, including
 the default use of a defined working directory and grep pattern matching. As with 
-all functions i nthis package, you must first define your environment with s3_set().
+all functions in this package, you must first define your environment with s3_set().
 }

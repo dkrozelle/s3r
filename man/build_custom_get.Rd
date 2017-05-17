@@ -6,9 +6,15 @@
 \usage{
 build_custom_get(FUN, fun.defaults = NULL)
 }
+\arguments{
+\item{FUN}{function name, unquoted, used to read the file.}
+
+\item{fun.args}{list of named arguments to pass to FUN}
+}
 \value{
 function
 }
 \description{
-Helper function to build custom S3 object readers.
+Use this helper function to build custom reader tools. Define a function and 
+associated arguments for reading into R and save as a reusable function.
 }

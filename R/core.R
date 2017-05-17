@@ -6,10 +6,17 @@
 #' settings without explicitly changing previous settings. 
 #'
 #' @param bucket base name for s3 bucket e.g. "s3://bucket-name" or "bucket-name"
-#' @param cwd character string path, optional to define a working prefix
-#' @param local.cache character string, path of a local scratch directory. This will
-#'                    be placed at /tmp/s3-cache when called the first time if none
-#'                    is specified. 
+#' @param profile character string for the credential profile you configured in aws cli
+#' @param cache character string for where to store local versions of downloaded s3 objects.
+#'             Defaults to current working directory.
+#' @param sse logical should server-side encryption be used. NOTE: This does not enable
+#'            encryption on your bucket, but adds the --sse flag to write commands
+#'             where it is required for encrypted buckets.
+#' @param cwd character string path to define a working prefix. Defults to 
+#'            root of the bucket
+#' @param aws.args character string of any additional values you need appended to an 
+#'           aws.cli command line call. This should likely be left blank and 
+#'           applied to individual calls where appropriate.
 #'
 #' @return list, invisibly returns a list of environment variable settings
 #' @export
@@ -110,6 +117,11 @@ s3_set <- function(
 }
 
 #' Set the current working directory on S3
+#' 
+#' @param ... flexible s3 path description of where to set the current working 
+#'             directory. Accepts a character vector "top/next", separate 
+#'             character strings c("top", "next"), or lists list("top", "next") 
+#' 
 #' @return returns the new cwd value
 #' @export
 s3_cd <- function(...){

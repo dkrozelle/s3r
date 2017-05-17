@@ -6,9 +6,20 @@
 \usage{
 s3_get_save(..., aws.args = NULL)
 }
+\arguments{
+\item{...}{flexible s3 path description of s3 location and object name. This is 
+relative to your cwd (use s3_cd() to print your cwd). Accepts a character 
+vector "top/next", separate character strings c("top", "next"), or 
+lists list("top", "next").}
+
+\item{aws.args}{character string of any additional values you need appended to this 
+aws.cli command line call.}
+}
 \value{
 file path
 }
 \description{
-Download an S3 object to local cache directory.
+Use this version if you'd like to keep the local file cached and work on it
+directly (e.g. pass to other bash scripts). Particularly useful if this is a 
+big file you only want to download once.
 }

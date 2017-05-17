@@ -1,5 +1,14 @@
-#' Download an S3 object and read into R using specified write function.
+#' Download an S3 object and read into R using specified read function.
 #'
+#' @param ... flexible s3 path description of s3 location and object name. This is 
+#' relative to your cwd (use s3_cd() to print your cwd). Accepts a character 
+#' vector "top/next", separate character strings c("top", "next"), or 
+#' lists list("top", "next").
+#' @param FUN function name, unquoted, used to read the file.
+#' @param fun.args list of named arguments to pass to FUN
+#' @param aws.args character string of any additional values you need appended 
+#' to this aws.cli command line call.
+#' 
 #' @return S3 object
 #' @export
 s3_get_with <- function(..., FUN, fun.args = NULL, aws.args = NULL) {
@@ -39,7 +48,18 @@ s3_get_with <- function(..., FUN, fun.args = NULL, aws.args = NULL) {
 }
 
 #' Download an S3 object to local cache directory.
+#' 
+#' Use this version if you'd like to keep the local file cached and work on it
+#' directly (e.g. pass to other bash scripts). Particularly useful if this is a 
+#' big file you only want to download once.
 #'
+#' @param ... flexible s3 path description of s3 location and object name. This is 
+#' relative to your cwd (use s3_cd() to print your cwd). Accepts a character 
+#' vector "top/next", separate character strings c("top", "next"), or 
+#' lists list("top", "next").
+#' @param aws.args character string of any additional values you need appended to this 
+#' aws.cli command line call.
+#' 
 #' @return file path
 #' @export
 s3_get_save <- function(..., aws.args = NULL) {
@@ -78,6 +98,12 @@ s3_get_save <- function(..., aws.args = NULL) {
 
 #' Helper function to build custom S3 object readers.
 #' 
+#' Use this helper function to build custom reader tools. Define a function and 
+#' associated arguments for reading into R and save as a reusable function.
+#'
+#' @param FUN function name, unquoted, used to read the file.
+#' @param fun.args list of named arguments to pass to FUN
+#' 
 #' @return function
 #' @export
 build_custom_get <- function(FUN, fun.defaults = NULL){
@@ -98,8 +124,9 @@ build_custom_get <- function(FUN, fun.defaults = NULL){
   }
 }
 
-#' Read an S3 table into R
+#' Read a tab-delim table into R
 #' 
+#' Example of a custom import tool created with s3_get_table <- build_custom_get(FUN = read.table, fun.defaults = list(header = T, sep = {TAB}, quote = F, na.strings = c("NA", "") ))
 #' @return an S3 object read into R using read.table
 #' @export
 s3_get_table <- build_custom_get(FUN = read.table, 
@@ -109,7 +136,10 @@ s3_get_table <- build_custom_get(FUN = read.table,
                                                      na.strings = c("NA", "")
                                  ))
 
-#' Read an S3 table into R
+#' Read a csv table into R
+#' 
+#' Example of a custom import tool created with 
+#' s3_get_table <- build_custom_get(FUN = read.csv)
 #' 
 #' @return an S3 object read into R using read.table
 #' @export

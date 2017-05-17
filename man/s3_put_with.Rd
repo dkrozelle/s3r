@@ -2,13 +2,26 @@
 % Please edit documentation in R/put.R
 \name{s3_put_with}
 \alias{s3_put_with}
-\title{Write an object in memory to S3 using specified write function.}
+\title{Write an R object to S3 using specified write function.}
 \usage{
 s3_put_with(x, FUN, ..., fun.args = NULL, aws.args = NULL)
+}
+\arguments{
+\item{FUN}{function name, unquoted, used to write the file.}
+
+\item{...}{flexible s3 path description of s3 location and object name. This is 
+relative to your cwd (use s3_cd() to print your cwd). Accepts a character 
+vector "top/next", separate character strings c("top", "next"), or 
+lists list("top", "next").}
+
+\item{fun.args}{list of named arguments to pass to FUN}
+
+\item{aws.args}{character string of any additional values you need appended 
+to this aws.cli command line call.}
 }
 \value{
 character string for s3 uri where an object was written
 }
 \description{
-Write an object in memory to S3 using specified write function.
+Write an R object to S3 using specified write function.
 }

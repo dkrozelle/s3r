@@ -2,18 +2,26 @@
 #'
 #' List the items in an S3 bucket. Lots of time-saving filters are built-in, including
 #' the default use of a defined working directory and grep pattern matching. As with 
-#' all functions i nthis package, you must first define your environment with s3_set().
+#' all functions in this package, you must first define your environment with s3_set().
 #'
-#' @param ...  
+#' @param ... flexible s3 path description of s3 location and object name. This is 
+#' relative to your cwd (use s3_cd() to print your cwd). Accepts a character 
+#' vector "top/next", separate character strings c("top", "next"), or 
+#' lists list("top", "next").
 #' @param recursive  logical, when enabled lists all files under the defined 
 #' directory. Currently the return is not optimal, and returns a root-based path 
 #' independent of cwd. For example: cwd=s3"//bucket/one/two/three/ will return
 #' s3_ls(".") as "one/two/three/file.txt" instead of the expected "file.txt"
-#' @param pattern    character,
-#' @param list.names logical,
-#' @param files.only logical,
-#' @param dir.only   logical, NOTE: does not work with recursive = T
-#' @param aws.args   character,
+#' @param pattern    character string pattern to filter results.
+#' @param full.names logical return fully qualified file names.
+#' @param files.only logical filter to show only files
+#' @param dir.only   logical filter to show only directories. NOTE: Due to the fact 
+#' that directories don't actually exist on S3, this won't work with recursive = T
+#' @param all.files logical show unnamed objects ("")
+#' @param full.response logical list entire metadata string from aws. Includes file
+#' modified date/time and size.
+#' @param aws.args character string of any additional values you need appended 
+#' to this aws.cli command line call.
 #' 
 #' @return character vector of bucket contents
 #' @export
@@ -25,7 +33,6 @@ s3_ls <- function( ... ,
                    dir.only   = FALSE, 
                    all.files  = FALSE,
                    full.response = FALSE,
-                   
                    aws.args   = NULL){
   
   # we assume the path supplied is a directory

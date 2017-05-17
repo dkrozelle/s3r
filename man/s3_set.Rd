@@ -10,11 +10,21 @@ s3_set(bucket = "s3r-test-bucket", profile = "s3r-read-write-user",
 \arguments{
 \item{bucket}{base name for s3 bucket e.g. "s3://bucket-name" or "bucket-name"}
 
-\item{cwd}{character string path, optional to define a working prefix}
+\item{profile}{character string for the credential profile you configured in aws cli}
 
-\item{local.cache}{character string, path of a local scratch directory. This will
-be placed at /tmp/s3-cache when called the first time if none
-is specified.}
+\item{cache}{character string for where to store local versions of downloaded s3 objects.
+Defaults to current working directory.}
+
+\item{sse}{logical should server-side encryption be used. NOTE: This does not enable
+encryption on your bucket, but adds the --sse flag to write commands
+ where it is required for encrypted buckets.}
+
+\item{cwd}{character string path to define a working prefix. Defults to 
+root of the bucket}
+
+\item{aws.args}{character string of any additional values you need appended to an 
+aws.cli command line call. This should likely be left blank and 
+applied to individual calls where appropriate.}
 }
 \value{
 list, invisibly returns a list of environment variable settings

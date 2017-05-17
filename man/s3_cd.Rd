@@ -6,6 +6,11 @@
 \usage{
 s3_cd(...)
 }
+\arguments{
+\item{...}{flexible s3 path description of where to set the current working 
+directory. Accepts a character vector "top/next", separate 
+character strings c("top", "next"), or lists list("top", "next")}
+}
 \value{
 returns the new cwd value
 }

@@ -2,13 +2,26 @@
 % Please edit documentation in R/get.R
 \name{s3_get_with}
 \alias{s3_get_with}
-\title{Download an S3 object and read into R using specified write function.}
+\title{Download an S3 object and read into R using specified read function.}
 \usage{
 s3_get_with(..., FUN, fun.args = NULL, aws.args = NULL)
+}
+\arguments{
+\item{...}{flexible s3 path description of s3 location and object name. This is 
+relative to your cwd (use s3_cd() to print your cwd). Accepts a character 
+vector "top/next", separate character strings c("top", "next"), or 
+lists list("top", "next").}
+
+\item{FUN}{function name, unquoted, used to read the file.}
+
+\item{fun.args}{list of named arguments to pass to FUN}
+
+\item{aws.args}{character string of any additional values you need appended 
+to this aws.cli command line call.}
 }
 \value{
 S3 object
 }
 \description{
-Download an S3 object and read into R using specified write function.
+Download an S3 object and read into R using specified read function.
 }

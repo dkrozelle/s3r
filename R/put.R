@@ -1,5 +1,14 @@
-#' Write an object in memory to S3 using specified write function.
+#' Write an R object to S3 using specified write function.
 #'
+#' @param ... flexible s3 path description of s3 location and object name. This is 
+#' relative to your cwd (use s3_cd() to print your cwd). Accepts a character 
+#' vector "top/next", separate character strings c("top", "next"), or 
+#' lists list("top", "next").
+#' @param FUN function name, unquoted, used to write the file.
+#' @param fun.args list of named arguments to pass to FUN
+#' @param aws.args character string of any additional values you need appended 
+#' to this aws.cli command line call.
+#' 
 #' @return character string for s3 uri where an object was written
 #' @export
 s3_put_with <- function(x, FUN, ..., 
@@ -43,7 +52,18 @@ s3_put_with <- function(x, FUN, ...,
   }
 }
 
-#' Put a local file on S3.
+#' Put a local file on S3
+#' 
+#' Use this version to easily transfer a local file (either in your local.cache
+#' or another local directory) into an s3 bucket. As always, unqualified s3 names 
+#' will use current working directory.
+#'
+#' @param from,to list enclosing a flexible local and s3 path description. Same as 
+#' typical ... arguments, but since we need two location you need to wrap multiple
+#' items in a list.
+#' Easy, no? s3_put_s3(from = "file_in_current_dir.txt", to = list("top", "new_filename.txt") )
+#' @param aws.args character string of any additional values you need appended to this 
+#' aws.cli command line call.
 #'
 #' @return s3 uri
 #' @export

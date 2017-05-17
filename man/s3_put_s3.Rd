@@ -2,13 +2,24 @@
 % Please edit documentation in R/put.R
 \name{s3_put_s3}
 \alias{s3_put_s3}
-\title{Put a local file on S3.}
+\title{Put a local file on S3}
 \usage{
 s3_put_s3(from, to, aws.args = NULL)
+}
+\arguments{
+\item{from, to}{list enclosing a flexible local and s3 path description. Same as 
+typical ... arguments, but since we need two location you need to wrap multiple
+items in a list.
+Easy, no? s3_put_s3(from = "file_in_current_dir.txt", to = list("top", "new_filename.txt") )}
+
+\item{aws.args}{character string of any additional values you need appended to this 
+aws.cli command line call.}
 }
 \value{
 s3 uri
 }
 \description{
-Put a local file on S3.
+Use this version to easily transfer a local file (either in your local.cache
+or another local directory) into an s3 bucket. As always, unqualified s3 names 
+will use current working directory.
 }

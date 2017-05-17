@@ -2,7 +2,7 @@
 % Please edit documentation in R/get.R
 \name{s3_get_table}
 \alias{s3_get_table}
-\title{Read an S3 table into R}
+\title{Read a tab-delim table into R}
 \usage{
 s3_get_table(..., fun.args = NULL, aws.args = NULL)
 }
@@ -10,5 +10,5 @@ s3_get_table(..., fun.args = NULL, aws.args = NULL)
 an S3 object read into R using read.table
 }
 \description{
-Read an S3 table into R
+Example of a custom import tool created with s3_get_table <- build_custom_get(FUN = read.table, fun.defaults = list(header = T, sep = {TAB}, quote = F, na.strings = c("NA", "") ))
 }
