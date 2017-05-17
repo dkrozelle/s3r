@@ -1,0 +1,72 @@
+
+df <- s3_get_table("DSRT_MM_Merge.txt")
+
+head(df)
+df$new.column <- NA
+
+s3_put_table("DSRT_MM_Merge.txt")
+
+s3_wd("AML")
+s3_wd()
+"s3://celgene-helsinki-bucket/AML/"
+
+# access using the working directory
+df <- s3_get_table("Helsinki_AML_inventory.xlsx", sheet = "clinical")
+
+# using a fully formed bucket prefix, this is automatically recognized by s3:// prefix
+df <- s3_get_table(file.path(e$bucket, "MM", Helsinki_AML_inventory.xlsx"),
+                             sheet = "clinical")
+                             
+# move command will similarly use either wd-based paths or full paths
+s3_mv(from = "Helsinki_AML_inventory.xlsx", to = "archive/Helsinki_AML_inventory.xlsx")
+                             
+                             # if the "to" command ends in fsep, you don't need to retype the file name
+                             s3_mv(from = "Helsinki_AML_inventory.xlsx", to = "archive/")
+                             
+                             # you can even use a combination of path qualifications
+                             s3_mv(from = "Helsinki_AML_inventory.xlsx", to = file.path(e$bucket, "another/location/"))
+                             
+                             # use s3_mv like mv to rename a file
+                             s3_mv(from = "Helsinki_AML_inventory.xlsx", to = "BAD_inventory.xlsx")
+                             
+                             # or s3_cp to copy
+                             s3_cp(from = "Helsinki_AML_inventory.xlsx", to = "BAD_inventory.xlsx")
+                             
+                             # all tools can be passed commandline arguments directly
+                             s3_ls(aws.args = '--recursive')
+                             
+                             # I'm a big fan of testing operations before committing them, so use --dryrun
+                             s3_mv(from = "Helsinki_AML_inventory.xlsx", to = "archive/", aws.args = '--dryrun')
+                             
+                             # in order to use working directories we do incur a limitation:
+                             # s3_mv and s3_cp can only by used between s3 locations.
+                             #
+                             # to transfer to/from s3 to a local file system you must use s3_get/s3_put
+                             
+                             # if you've defined a local cache location in your s3 environment you don't need
+                             # to specify the local location
+                             name <- "Helsinki_AML_inventory.xlsx"
+                             s3_get(name)
+                             df <- auto_read(file_path(e$local, name), sheet = "inventory")
+                             write_table(df, file_path(e$local, "new_file_name.txt"), row.names = F, sep = "\t", quote = F )
+                             
+                             # if you only specify a local file, it will be placed in the wd
+                             s3_put(file_path(e$local, "new_file_name.txt"))
+                             
+                             # or you can specify a full location
+                             s3_put(file_path(e$local, "new_file_name.txt"),
+                             to = file.path(e$bucket, "another/location/"))
+                             
+                             # with a new name
+                             s3_put(file_path(e$local, "new_file_name.txt"),
+                             to = file.path(e$bucket, "another/location/even_newer_name.txt"))
+                             
+                             # guess what, you don't even need to specify the local cache directory
+                             s3_put("new_file_name.txt")
+                             
+                             s3_put("new_file_name.txt",
+                             to = file.path(e$bucket, "another/location/even_newer_name.txt"))
+                             
+                             
+                             # you should be able to transfer to other buckets if you fully qualify the location
+                             s3_mv(from = "file_in_s3_bucket_1.csv", to = file.path("s3://another.bucket", "other/location/"))
