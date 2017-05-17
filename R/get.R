@@ -12,7 +12,7 @@ s3_get_with <- function(..., FUN, fun.args = NULL, aws.args = NULL) {
     message('missing required s3 object name (...)')
     return(1)
   }
-
+  
   # define to/from locations
   s3.path    <- build_uri(...) 
   local.path <- file.path(s3e$cache, basename(s3.path))
@@ -26,14 +26,16 @@ s3_get_with <- function(..., FUN, fun.args = NULL, aws.args = NULL) {
   
   response <- aws_cli(cmd)
   
-  if( response$code == 0 & file.exists(local.path) ){
+  if( any(response == 1) ){
+    message('error fetching object from s3')
+    return(1)
+  }else if(file.exists(local.path)){
     x <- do.call(FUN, args = c(list(file = local.path), fun.args ))
     return(x)
   }else{
-    message('unable to get file')
+    message('unable to write to local file')
     return(1)
   }
-  
 }
 
 #' Download an S3 object to local cache directory.
@@ -50,11 +52,11 @@ s3_get_save <- function(..., aws.args = NULL) {
     message('missing required s3 object name (...)')
     return(1)
   }
-
+  
   # define to/from locations
   s3.path    <- build_uri(...) 
   local.path <- file.path(s3e$cache, basename(s3.path))
-
+  
   # download the file
   cmd <- paste('aws s3 cp',
                aws.args,
@@ -63,10 +65,13 @@ s3_get_save <- function(..., aws.args = NULL) {
   
   response <- aws_cli(cmd)
   
-  if( response$code == 0 & file.exists(local.path) ){
+  if( any(response == 1) ){
+    message('error fetching object from s3')
+    return(1)
+  }else if(file.exists(local.path)){
     return(local.path)
   }else{
-    message('unable to get file')
+    message('unable to write to local file')
     return(1)
   }
 }
@@ -78,7 +83,7 @@ s3_get_save <- function(..., aws.args = NULL) {
 build_custom_get <- function(FUN, fun.defaults = NULL){
   
   # returns an s3_put_with function using predefined file writer and args
-  function(x, ..., fun.args = NULL, aws.args = NULL){
+  function(..., fun.args = NULL, aws.args = NULL){
     
     if( length(fun.args) > 0){
       fun.args <- c(fun.args, fun.defaults[!names(fun.defaults) %in% names(fun.args)])
@@ -102,4 +107,10 @@ s3_get_table <- build_custom_get(FUN = read.table,
                                                      sep        = "\t", 
                                                      quote      = F,
                                                      na.strings = c("NA", "")
-                                                     ))
+                                 ))
+
+#' Read an S3 table into R
+#' 
+#' @return an S3 object read into R using read.table
+#' @export
+s3_get_csv <- build_custom_get(FUN = read.csv)

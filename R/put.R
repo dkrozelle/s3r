@@ -29,12 +29,14 @@ s3_put_with <- function(x, FUN, ...,
     
     response <- aws_cli(cmd)
     
-    if( response$code == 0 ){
-      return(s3.path)
-    }else{
+    if( any(response == 1) ){
       message('unable to write file to s3')
       return(1)
+    }else{
+      return(s3.path)
     }
+    
+    
   }else{
     message('unable to write local file')
     return(1)

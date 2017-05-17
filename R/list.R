@@ -37,11 +37,11 @@ s3_ls <- function( ... ,
                path)
   response <- aws_cli(cmd)
 
-  if( response$code == 0 ){
-    resp <- response$content
-  }else{
-    message('unable to find requested s3 location')
+  if( any(response == 1) ){
+    message('unable to find that location')
     return(1)
+  }else{
+    resp <- response
   }
   
 

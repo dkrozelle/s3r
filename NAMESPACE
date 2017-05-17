@@ -3,6 +3,7 @@
 export(build_custom_get)
 export(build_custom_put)
 export(s3_cd)
+export(s3_get_csv)
 export(s3_get_save)
 export(s3_get_table)
 export(s3_get_with)

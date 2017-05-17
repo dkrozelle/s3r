@@ -129,14 +129,14 @@ s3_cd <- function(...){
   }
   
   # check the cwd exists, aws_cli throws it's own error if does not exist
-  response <- aws_cli(paste('aws s3 ls', proposed.cwd))
+  cmd <- paste('aws s3 ls', proposed.cwd)
+  
+  response <- aws_cli(cmd)
 
   if( any(response == 1) ){
-    print("error1")
-    message('unable to set cwd, does this location exist?')
-    return(1)
+    message(paste('unable to set cwd, does', proposed.cwd, 'location exist?'))
+    return(s3e$cwd)
   }else{
-    print("good")
     s3e$cwd <- proposed.cwd
     return(s3e$cwd)
   }

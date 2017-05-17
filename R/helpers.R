@@ -60,9 +60,10 @@ aws_cli <- function(cmd){
   cmd  <- paste(cmd, s3e$aws.args, s3e$profile)
   cmd  <- gsub(" +", " ", cmd)
   
-  response <- system(cmd, intern = T)
-  
-  if( length(response) == 0 ){
+  suppressWarnings(
+    response <- system(cmd, intern = T)
+  )
+  if( any(length(response) == 0) ){
     return(1)
   }else{
     return(response)
