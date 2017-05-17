@@ -351,9 +351,23 @@ For every get() function, there is a put() function. This makes sense since all 
 # processed subfolder of our cwd.
 df$X <- NULL
 s3_put_table(df, "processed_data/fixed_rownames.txt")
+```
+
+```
+## [1] "s3://s3r-test-bucket/top/next/third/processed_data/fixed_rownames.txt"
+```
+
+```r
 # lets take a look at what we have now, but only files below the 
 # directory named "third" 
 s3_ls(recursive = T, pattern = "third")
+```
+
+```
+## [1] "top/next/third/file.csv"                         
+## [2] "top/next/third/filename2.txt"                    
+## [3] "top/next/third/fourth/filename.txt"              
+## [4] "top/next/third/processed_data/fixed_rownames.txt"
 ```
 
 #### TBD

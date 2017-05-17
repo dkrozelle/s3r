@@ -131,7 +131,7 @@ s3_note <- build_custom_get(FUN = utils::file.edit)
 
 #### Putting files back onto s3
 For every get() function, there is a put() function. This makes sense since all the different file formats need to be saves in their own special way. Just remember, these all still use relative s3 file paths, so feel free to go crazy!
-```{r, eval = F}
+```{r}
 # if you were paying attention, a very bad person saved the file.csv and 
 # included row.names. Lets fix this and put the file back into a 
 # processed subfolder of our cwd.
