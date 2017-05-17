@@ -35,7 +35,6 @@ s3_ls <- function( ... ,
                aws.args,
                if(recursive) "--recursive",
                path)
-  print(cmd)
   response <- aws_cli(cmd)
 
   if( response$code == 0 ){

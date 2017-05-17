@@ -2,7 +2,7 @@ build_uri <- function(..., dir = F){
   if( !"s3e" %in% ls(envir = globalenv()) ){ 
     message('please use s3_set() before use.')
     return() }
-
+  
   # logic
   # if ... argument used and starts with s3, use it
   # if ... argument used and has cwd, add cwd
@@ -59,13 +59,12 @@ relative_path_adjuster <- function(path){
 aws_cli <- function(cmd){
   cmd  <- paste(cmd, s3e$aws.args, s3e$profile)
   cmd  <- gsub(" +", " ", cmd)
-  response <- list(content = system(cmd,       intern = T),
-                   code    = system('echo $?', intern = T))
   
-  if( response$code == 0 ){
-    return(response)
+  response <- system(cmd, intern = T)
+  
+  if( length(response) == 0 ){
+    return(1)
   }else{
-    message(paste('aws error code:', response$code))
     return(response)
   }
 }
