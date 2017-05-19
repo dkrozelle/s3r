@@ -3,7 +3,7 @@ Life is short, you shouldn't type so much when interacting with s3 buckets
 
 # Introduction to s3r
 Dan Rozelle  
-`r Sys.Date()`  
+2017-05-15
   
 Just sketching out how to use the core functionality of s3r. Be aware this is very alpha, and please feel free to reach out if you use this and have any feedback, much appreciated.
   
@@ -374,6 +374,5 @@ s3_ls(recursive = T, pattern = "third")
 ```
 
 #### TBD
-There are a couple of holes currently in this functionality, namely moving, copying, removing items from an s3 bucket. These are important, especially as you are learning to interact with a new bucket and need to move incorrectly placed things. I'm working on those now, just gimme a minute.
-
+I've just added s3_mv() and s3_cp() function but not quite ready, coming soon. 
 Dan
