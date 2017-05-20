@@ -1,3 +1,5 @@
+
+
 build_uri <- function(..., dir = F){
   if( !"s3e" %in% ls(envir = globalenv()) ){ 
     message('please use s3_set() before use.')
@@ -9,14 +11,7 @@ build_uri <- function(..., dir = F){
   # if no ... and has cwd, use cwd
   # else warning
   
-  # combine path elements, should accept separate objects, list, or a character vector
-  if( length(list(...) ) == 0 ){
-    path <- NA
-  }else if( length(list(...)) > 1 ){
-    path <- file.path(...)
-  }else{
-    path <- do.call(file.path, as.list(...))
-  }
+  path <- capture_path_args(...)
   
   if( !is.na(path) && grepl("^s3:\\/\\/", path) ){
     path <- path
@@ -44,7 +39,7 @@ build_uri <- function(..., dir = F){
     return(uri)
   }else{
     message('valid uri was not able to be created')
-    return()
+    return(1)
   }
 }
 
@@ -120,5 +115,45 @@ relative_path_adjustment <- function(path, wd = s3e$cwd){
   }
 }
 
+capture_path_args <- function(...){
+  # combine path elements, should accept separate objects, list, or a character vector
+  if( length(list(...) ) == 0 ){
+    path <- NA
+  }else if( length(list(...)) > 1 ){
+    path <- file.path(...)
+  }else{
+    path <- do.call(file.path, as.list(...))
+  }
+}
 
+
+path_exists <- function(path){
+  cmd <- paste('aws s3 ls', path)
+  response <- aws_cli(cmd)
+  
+  if( any(response == 1) ){
+    return(FALSE)
+  }else{
+    return(TRUE)
+  }}
+
+build_local_path <- function(name, unique_filename){
+  
+  if(unique_filename){
+    files <- c(list.files(s3e$cache),name)
+    # check if ther are any totally duplicate files
+    if(any(duplicated(files))){
+      # remove file extension before increment
+      # this only takes off the last . extension
+      
+      no.ext <- gsub("^(.*)\\.(.*)$", "\\1", files)
+      ext    <- gsub("^(.*)\\.(.*)$", "\\2", files)
+      l      <- length(files)
+      name <- paste(make.unique(no.ext)[l], ext[l], sep = ".")
+    }
+    
+  }
+  file.path(s3e$cache, name)
+  
+}
 

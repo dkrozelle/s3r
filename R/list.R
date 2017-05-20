@@ -36,8 +36,9 @@ s3_ls <- function( ... ,
                    aws.args   = NULL){
   
   # we assume the path supplied is a directory
-  path <- build_uri(..., dir = T)
-  
+  path      <- build_uri(..., dir = T)
+  path.base <- gsub(paste0(s3e$bucket,"\\/"), "", path)
+
   cmd <- paste('aws s3 ls',
                aws.args,
                if(recursive) "--recursive",
@@ -74,7 +75,12 @@ s3_ls <- function( ... ,
 
   if( !is.null(pattern) ) resp <- grep(pattern, resp, value = T)
   
-  if( full.names )        resp <- file.path(chomp_slash(path), resp)
-
+  if( full.names ){
+    resp <- file.path(chomp_slash(path), resp)
+  }else if(!is.na(path.base)){
+    # trim initial argument path if this is the first recursive ls call
+    resp <- gsub(path.base, "", resp)
+  }
+  
   return(resp)
 }

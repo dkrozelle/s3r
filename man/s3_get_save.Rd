@@ -4,7 +4,7 @@
 \alias{s3_get_save}
 \title{Download an S3 object to local cache directory.}
 \usage{
-s3_get_save(..., aws.args = NULL)
+s3_get_save(..., unique_filename = T, aws.args = NULL)
 }
 \arguments{
 \item{...}{flexible s3 path description of s3 location and object name. This is 

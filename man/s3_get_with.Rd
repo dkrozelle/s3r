@@ -4,7 +4,8 @@
 \alias{s3_get_with}
 \title{Download an S3 object and read into R using specified read function.}
 \usage{
-s3_get_with(..., FUN, fun.args = NULL, aws.args = NULL)
+s3_get_with(..., FUN, fun.args = NULL, cache = F, unique_filename = T,
+  aws.args = NULL)
 }
 \arguments{
 \item{...}{flexible s3 path description of s3 location and object name. This is 

@@ -11,7 +11,7 @@
 #' 
 #' @return S3 object
 #' @export
-s3_get_with <- function(..., FUN, fun.args = NULL, aws.args = NULL) {
+s3_get_with <- function(..., FUN, fun.args = NULL, cache = F, unique_filename = T, aws.args = NULL) {
   
   if( !check_vars("cache") ){
     message('please define a local cache with s3_set(cache = "/tmp") before use')
@@ -24,8 +24,10 @@ s3_get_with <- function(..., FUN, fun.args = NULL, aws.args = NULL) {
   
   # define to/from locations
   s3.path    <- build_uri(...) 
-  local.path <- file.path(s3e$cache, basename(s3.path))
-  on.exit(unlink(local.path))
+  
+  local.path <- build_local_path(basename(s3.path), 
+                                 unique_filename = unique_filename)
+  if(!cache) on.exit(unlink(local.path))
   
   # download the file
   cmd <- paste('aws s3 cp',
@@ -62,7 +64,7 @@ s3_get_with <- function(..., FUN, fun.args = NULL, aws.args = NULL) {
 #' 
 #' @return file path
 #' @export
-s3_get_save <- function(..., aws.args = NULL) {
+s3_get_save <- function(..., unique_filename = T, aws.args = NULL) {
   
   if( !check_vars("cache") ){
     message('please define a local cache with s3_set(cache = "/tmp") before use')
@@ -75,8 +77,9 @@ s3_get_save <- function(..., aws.args = NULL) {
   
   # define to/from locations
   s3.path    <- build_uri(...) 
-  local.path <- file.path(s3e$cache, basename(s3.path))
-  
+  local.path <- build_local_path(basename(s3.path), 
+                                 unique_filename = unique_filename)
+    
   # download the file
   cmd <- paste('aws s3 cp',
                aws.args,
@@ -132,7 +135,6 @@ build_custom_get <- function(FUN, fun.defaults = NULL){
 s3_get_table <- build_custom_get(FUN = read.table, 
                                  fun.defaults = list(header     = T,
                                                      sep        = "\t", 
-                                                     quote      = F,
                                                      na.strings = c("NA", "")
                                  ))
 
