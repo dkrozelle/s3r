@@ -21,8 +21,8 @@
 #' @return list, invisibly returns a list of environment variable settings
 #' @export
 s3_set <- function(
-  bucket   = 's3r-test-bucket',
-  profile  = 's3r-read-write-user',
+  bucket   = NULL,
+  profile  = NULL,
   cache    = NULL,
   sse      = NULL,
   cwd      = NULL,

@@ -11,7 +11,7 @@ s3_mv(from = NULL, to = NULL, allow.overwrite = FALSE, aws.args = NULL)
 
 \item{to}{character vector or list}
 
-\item{aws.args}{character string of any additional values you need appended to this 
+\item{aws.args}{character string of any additional values you need appended to this
 aws.cli command line call.}
 }
 \value{

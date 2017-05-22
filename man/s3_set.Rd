@@ -4,8 +4,8 @@
 \alias{s3_set}
 \title{Configure s3r environment which stores S3 bucket metadata.}
 \usage{
-s3_set(bucket = "s3r-test-bucket", profile = "s3r-read-write-user",
-  cache = NULL, sse = NULL, cwd = NULL, aws.args = NULL)
+s3_set(bucket = NULL, profile = NULL, cache = NULL, sse = NULL,
+  cwd = NULL, aws.args = NULL)
 }
 \arguments{
 \item{bucket}{base name for s3 bucket e.g. "s3://bucket-name" or "bucket-name"}
