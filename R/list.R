@@ -75,11 +75,13 @@ s3_ls <- function( ... ,
 
   if( !is.null(pattern) ) resp <- grep(pattern, resp, value = T)
   
-  if( full.names ){
-    resp <- file.path(chomp_slash(path), resp)
-  }else if(!is.na(path.base)){
-    # trim initial argument path if this is the first recursive ls call
+  
+  if(!is.na(path.base)){
     resp <- gsub(path.base, "", resp)
+  }
+  
+  if( full.names ){
+    resp <- file.path(chomp_slash(s3e$bucket), chomp_slash(path.base), resp)
   }
   
   return(resp)
