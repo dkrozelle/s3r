@@ -61,6 +61,7 @@ s3_cp <- function( from            = NULL,
                  verb,
                  from.path,
                  to.path,
+                 s3e$sse,
                  s3e$aws.args,
                  aws.args)
 
