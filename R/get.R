@@ -135,7 +135,8 @@ build_custom_get <- function(FUN, fun.defaults = NULL){
 s3_get_table <- build_custom_get(FUN = read.table, 
                                  fun.defaults = list(header     = T,
                                                      sep        = "\t", 
-                                                     na.strings = c("NA", "")
+                                                     na.strings = c("NA", ""),
+                                                     stringsAsFactors = F
                                  ))
 
 #' Read a csv table into R
