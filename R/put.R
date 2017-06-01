@@ -94,7 +94,7 @@ s3_put_s3 <- function(from, to, aws.args = NULL) {
     
     response <- aws_cli(cmd)
     
-    if( response$code == 0 ){
+    if( any(response == 1) ){
       return(s3.path)
     }else{
       message('unable to write file to s3')
