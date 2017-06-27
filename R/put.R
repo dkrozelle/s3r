@@ -85,7 +85,7 @@ s3_put_s3 <- function(from, to, aws.args = NULL) {
   s3.path    <- build_uri(to) 
   
   if( file.exists(local.path) ){
-    cmd <- paste('aws s3 cp',
+        cmd <- paste('aws s3 cp',
                  local.path,
                  s3.path,
                  s3e$sse,
@@ -95,11 +95,12 @@ s3_put_s3 <- function(from, to, aws.args = NULL) {
     response <- aws_cli(cmd)
     
     if( any(response == 1) ){
-      return(s3.path)
-    }else{
       message('unable to write file to s3')
       return(1)
+    }else{
+      return(s3.path)
     }
+    
   }else{
     message('unable to write local file')
     return(1)

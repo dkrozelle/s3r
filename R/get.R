@@ -41,7 +41,9 @@ s3_get_with <- function(..., FUN, fun.args = NULL, cache = F, unique_filename = 
     message('error fetching object from s3')
     return(1)
   }else if(file.exists(local.path)){
-    x <- do.call(FUN, args = c(list(file = local.path), fun.args ))
+    # this function call assumes the first read argument is the file path
+    # but we leave it unnamed since readxl uses "path" and read.delim uses "file"
+    x <- do.call(FUN, args = c(list(local.path), fun.args ))
     return(x)
   }else{
     message('unable to write to local file')
