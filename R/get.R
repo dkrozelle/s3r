@@ -134,9 +134,8 @@ build_custom_get <- function(FUN, fun.defaults = NULL){
 #' Example of a custom import tool created with s3_get_table <- build_custom_get(FUN = read.table, fun.defaults = list(header = T, sep = {TAB}, quote = F, na.strings = c("NA", "") ))
 #' @return an S3 object read into R using read.table
 #' @export
-s3_get_table <- build_custom_get(FUN = read.table, 
-                                 fun.defaults = list(header     = T,
-                                                     sep        = "\t", 
+s3_get_table <- build_custom_get(FUN = utils::read.delim, 
+                                 fun.defaults = list(sep        = "\t", 
                                                      na.strings = c("NA", ""),
                                                      stringsAsFactors = F
                                  ))
