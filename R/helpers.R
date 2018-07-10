@@ -33,7 +33,7 @@ build_uri <- function(..., dir = F){
   }else{
     uri <- chomp_slash(path)
   }
-  
+
   # check before returning
   if( valid_uri(uri) ){ 
     return(uri)
@@ -54,6 +54,8 @@ relative_path_adjuster <- function(path){
 aws_cli <- function(cmd){
   cmd  <- paste(cmd, s3e$aws.args, s3e$profile)
   cmd  <- gsub(" +", " ", cmd)
+  
+  write(cmd, file=file.path(s3e$cache, "command.log"), append=TRUE)
   
   suppressWarnings(
     response <- system(cmd, intern = T)

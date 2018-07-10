@@ -30,6 +30,16 @@ s3_cp <- function( from            = NULL,
            allow.overwrite = allow.overwrite)
 }
 
+#' @export
+s3_sync <- function(from            = NULL,
+                   to              = NULL,
+                   aws.args        = NULL){
+  .s3_move(verb = "sync",
+           from = from,
+           to   = to,
+           aws.args = aws.args,
+           allow.overwrite = TRUE)
+}
 
 .s3_move <- function(verb      = NULL,
                      from      = NULL,

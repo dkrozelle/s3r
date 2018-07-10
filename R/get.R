@@ -87,7 +87,7 @@ s3_get_save <- function(..., unique_filename = T, aws.args = NULL) {
                aws.args,
                s3.path,
                local.path)
-  
+
   response <- aws_cli(cmd)
   
   if( any(response == 1) ){

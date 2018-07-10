@@ -28,6 +28,7 @@ s3_put_with <- function(x, FUN, ...,
   
   on.exit(unlink(local.path))
   do.call(FUN, args = c(list(x, file = local.path), fun.args ))
+  print(paste('file written to:', local.path))
   
   if( file.exists(local.path) ){
     cmd <- paste('aws s3 cp',
