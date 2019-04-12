@@ -32,8 +32,9 @@ s3_get_with <- function(..., FUN, fun.args = NULL, cache = F, unique_filename = 
   # download the file
   cmd <- paste('aws s3 cp',
                aws.args,
-               s3.path,
-               local.path)
+               paste0('"',s3.path,'"'),
+               paste0('"',local.path,'"')
+               )
   
   response <- aws_cli(cmd)
   
@@ -85,8 +86,8 @@ s3_get_save <- function(..., unique_filename = T, aws.args = NULL) {
   # download the file
   cmd <- paste('aws s3 cp',
                aws.args,
-               s3.path,
-               local.path)
+               paste0('"',s3.path,'"'),
+               paste0('"',local.path,'"') )
 
   response <- aws_cli(cmd)
   

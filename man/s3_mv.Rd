@@ -4,7 +4,8 @@
 \alias{s3_mv}
 \title{Move objects in an S3 bucket.}
 \usage{
-s3_mv(from = NULL, to = NULL, allow.overwrite = FALSE, aws.args = NULL)
+s3_mv(from = NULL, to = NULL, allow.overwrite = FALSE,
+  aws.args = NULL)
 }
 \arguments{
 \item{from}{character vector or list}

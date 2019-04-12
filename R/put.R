@@ -32,8 +32,8 @@ s3_put_with <- function(x, FUN, ...,
   
   if( file.exists(local.path) ){
     cmd <- paste('aws s3 cp',
-                 local.path,
-                 s3.path,
+                 paste0('"',local.path,'"'),
+                 paste0('"',s3.path,'"'),
                  s3e$sse,
                  s3e$aws.args,
                  aws.args)
@@ -82,13 +82,13 @@ s3_put_s3 <- function(from, to, aws.args = NULL) {
   }else{
     local.path <- file.path(from)
   }
-
+  
   s3.path    <- build_uri(to) 
   
   if( file.exists(local.path) ){
-        cmd <- paste('aws s3 cp',
-                 local.path,
-                 s3.path,
+    cmd <- paste('aws s3 cp',
+                 paste0('"',local.path,'"'),
+                 paste0('"',s3.path,'"'),
                  s3e$sse,
                  s3e$aws.args,
                  aws.args)

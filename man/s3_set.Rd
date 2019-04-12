@@ -5,7 +5,7 @@
 \title{Configure s3r environment which stores S3 bucket metadata.}
 \usage{
 s3_set(bucket = NULL, profile = NULL, cache = NULL, sse = NULL,
-  cwd = NULL, aws.args = NULL)
+  cwd = NULL, aws.args = NULL, create_command_log = TRUE)
 }
 \arguments{
 \item{bucket}{base name for s3 bucket e.g. "s3://bucket-name" or "bucket-name"}
@@ -25,6 +25,9 @@ root of the bucket}
 \item{aws.args}{character string of any additional values you need appended to an 
 aws.cli command line call. This should likely be left blank and 
 applied to individual calls where appropriate.}
+
+\item{create_command_log}{boolean, if True a file (command.log) will be created
+in the working directory and appended with all aws command line calls.}
 }
 \value{
 list, invisibly returns a list of environment variable settings

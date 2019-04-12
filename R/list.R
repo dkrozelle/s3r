@@ -36,13 +36,13 @@ s3_ls <- function( ... ,
                    aws.args   = NULL){
   
   # we assume the path supplied is a directory
-  path      <- build_uri(..., dir = T)
-  path.base <- gsub(paste0(s3e$bucket,"\\/"), "", path)
+  s3.path      <- build_uri(..., dir = T)
+  path.base <- gsub(paste0(s3e$bucket,"\\/"), "", s3.path)
 
   cmd <- paste('aws s3 ls',
                aws.args,
                if(recursive) "--recursive",
-               path)
+               paste0('"',s3.path,'"'))
   response <- aws_cli(cmd)
 
   if( any(response == 1) ){
@@ -57,7 +57,7 @@ s3_ls <- function( ... ,
     resp
   }else{
     # trim date and size info
-    resp <- gsub("^.* ", "", resp) 
+    resp <- gsub("^[ :0-9-]+ ", "", resp) 
   }
   
 

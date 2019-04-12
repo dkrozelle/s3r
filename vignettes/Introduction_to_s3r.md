@@ -1,6 +1,15 @@
-# Introduction to s3r
-Dan Rozelle  
-`r Sys.Date()`  
+---
+title: "Introduction to s3r"
+author: "Dan Rozelle"
+date: "2019-04-11"
+output:
+  rmarkdown::html_vignette:
+    keep_md: true
+vignette: >
+  %\VignetteIndexEntry{"Introduction to s3r"}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
   
 Just sketching out how to use the core functionality of s3r. Be aware this is very alpha, and please feel free to reach out if you use this and have any feedback, much appreciated.
   
@@ -47,8 +56,10 @@ s3_ls()
 ```
 
 ```
-## [1] "processed_data/" "top/"            "file.csv"        "file1.txt"      
-## [5] "file2.csv"       "file2.txt"       "file3.csv"       "file4.csv"
+##  [1] "PRE processed_data2/" "PRE processed_data3/" "PRE top/"            
+##  [4] "file1.txt"            "file2.csv"            "file2.txt"           
+##  [7] "file3.csv"            "file4.csv"            "new_filename.txt"    
+## [10] "new_filename2.txt"
 ```
 
 ```r
@@ -64,7 +75,7 @@ s3_ls()
 ```
 
 ```
-## [1] "next/"
+## [1] "PRE next/"
 ```
 
 Before we get into additional functions, here are a few other examples of how to move around the cwd. These types of flexible arguments are accepted by all s3r functions, and are only required to be wrapped in a list when multiple locations are specified at one time (put, get, etc).
@@ -74,7 +85,7 @@ s3_ls()
 ```
 
 ```
-## [1] "next/"
+## [1] "PRE next/"
 ```
 
 ```r
@@ -83,7 +94,7 @@ s3_cd("another")
 ```
 
 ```
-## unable to set cwd, does s3://s3r-test-bucket/top/another location exist?
+## proposed location s3://s3r-test-bucket/top/another does not exist
 ```
 
 ```
@@ -95,8 +106,10 @@ s3_ls("..")
 ```
 
 ```
-## [1] "processed_data/" "top/"            "file.csv"        "file1.txt"      
-## [5] "file2.csv"       "file2.txt"       "file3.csv"       "file4.csv"
+##  [1] "PRE processed_data2/" "PRE processed_data3/" "PRE top/"            
+##  [4] "file1.txt"            "file2.csv"            "file2.txt"           
+##  [7] "file3.csv"            "file4.csv"            "new_filename.txt"    
+## [10] "new_filename2.txt"
 ```
 
 ```r
@@ -135,8 +148,10 @@ s3_ls()
 ```
 
 ```
-## [1] "processed_data/" "top/"            "file.csv"        "file1.txt"      
-## [5] "file2.csv"       "file2.txt"       "file3.csv"       "file4.csv"
+##  [1] "PRE processed_data2/" "PRE processed_data3/" "PRE top/"            
+##  [4] "file1.txt"            "file2.csv"            "file2.txt"           
+##  [7] "file3.csv"            "file4.csv"            "new_filename.txt"    
+## [10] "new_filename2.txt"
 ```
 
 ```r
@@ -145,7 +160,9 @@ s3_ls(files.only = T)
 ```
 
 ```
-## [1] "file.csv"  "file1.txt" "file2.csv" "file2.txt" "file3.csv" "file4.csv"
+## [1] "file1.txt"         "file2.csv"         "file2.txt"        
+## [4] "file3.csv"         "file4.csv"         "new_filename.txt" 
+## [7] "new_filename2.txt"
 ```
 
 ```r
@@ -154,14 +171,16 @@ s3_ls(full.names = T)
 ```
 
 ```
-## [1] "s3://s3r-test-bucket/processed_data/"
-## [2] "s3://s3r-test-bucket/top/"           
-## [3] "s3://s3r-test-bucket/file.csv"       
-## [4] "s3://s3r-test-bucket/file1.txt"      
-## [5] "s3://s3r-test-bucket/file2.csv"      
-## [6] "s3://s3r-test-bucket/file2.txt"      
-## [7] "s3://s3r-test-bucket/file3.csv"      
-## [8] "s3://s3r-test-bucket/file4.csv"
+##  [1] "s3://s3r-test-bucket//PRE processed_data2/"
+##  [2] "s3://s3r-test-bucket//PRE processed_data3/"
+##  [3] "s3://s3r-test-bucket//PRE top/"            
+##  [4] "s3://s3r-test-bucket//file1.txt"           
+##  [5] "s3://s3r-test-bucket//file2.csv"           
+##  [6] "s3://s3r-test-bucket//file2.txt"           
+##  [7] "s3://s3r-test-bucket//file3.csv"           
+##  [8] "s3://s3r-test-bucket//file4.csv"           
+##  [9] "s3://s3r-test-bucket//new_filename.txt"    
+## [10] "s3://s3r-test-bucket//new_filename2.txt"
 ```
 
 ```r
@@ -170,14 +189,16 @@ s3_ls(full.response = T)
 ```
 
 ```
-## [1] "                           PRE processed_data/"
-## [2] "                           PRE top/"           
-## [3] "2017-05-15 14:06:54         41 file.csv"       
-## [4] "2017-05-16 22:30:57         22 file1.txt"      
-## [5] "2017-05-16 22:29:34         41 file2.csv"      
-## [6] "2017-05-16 22:31:04         22 file2.txt"      
-## [7] "2017-05-16 22:29:46         41 file3.csv"      
-## [8] "2017-05-16 22:29:51         41 file4.csv"
+##  [1] "                           PRE processed_data2/" 
+##  [2] "                           PRE processed_data3/" 
+##  [3] "                           PRE top/"             
+##  [4] "2017-05-16 22:30:57         22 file1.txt"        
+##  [5] "2017-05-16 22:29:34         41 file2.csv"        
+##  [6] "2017-05-16 22:31:04         22 file2.txt"        
+##  [7] "2017-05-16 22:29:46         41 file3.csv"        
+##  [8] "2017-05-16 22:29:51         41 file4.csv"        
+##  [9] "2017-05-18 12:06:56         41 new_filename.txt" 
+## [10] "2017-05-18 12:34:57         41 new_filename2.txt"
 ```
 
 Some of the more advanced features include the usage of regex filtering. This is based on normal R grepl functionality, see ?grepl for more info.
@@ -187,7 +208,8 @@ s3_ls(pattern = "txt$")
 ```
 
 ```
-## [1] "file1.txt" "file2.txt"
+## [1] "file1.txt"         "file2.txt"         "new_filename.txt" 
+## [4] "new_filename2.txt"
 ```
 
 ```r
@@ -195,7 +217,8 @@ s3_ls(pattern = "2|3")
 ```
 
 ```
-## [1] "file2.csv" "file2.txt" "file3.csv"
+## [1] "PRE processed_data2/" "PRE processed_data3/" "file2.csv"           
+## [4] "file2.txt"            "file3.csv"            "new_filename2.txt"
 ```
 
 You can also look recursively into the directory, although due to some peculiarities with s3 structure, it will always be root-qualified instead of cwd qualified as with other s3_ls() calls. I'll likely fix this soon.
@@ -205,17 +228,24 @@ s3_ls(recursive = T)
 ```
 
 ```
-##  [1] "file.csv"                                        
-##  [2] "file1.txt"                                       
-##  [3] "file2.csv"                                       
-##  [4] "file2.txt"                                       
-##  [5] "file3.csv"                                       
-##  [6] "file4.csv"                                       
-##  [7] "processed_data/fixed_rownames.txt"               
-##  [8] "top/next/third/file.csv"                         
-##  [9] "top/next/third/filename2.txt"                    
-## [10] "top/next/third/fourth/filename.txt"              
-## [11] "top/next/third/processed_data/fixed_rownames.txt"
+##  [1] "file1.txt"                                        
+##  [2] "file2.csv"                                        
+##  [3] "file2.txt"                                        
+##  [4] "file3.csv"                                        
+##  [5] "file4.csv"                                        
+##  [6] "new_filename.txt"                                 
+##  [7] "new_filename2.txt"                                
+##  [8] "processed_data2/fixed_rownames.txt"               
+##  [9] "processed_data3/fixed_rownames.txt"               
+## [10] "top/next/filename.txt"                            
+## [11] "top/next/third/file.csv"                          
+## [12] "top/next/third/filename2.txt"                     
+## [13] "top/next/third/fourth/filename.txt"               
+## [14] "top/next/third/processed_data/fixed_rownames.txt" 
+## [15] "top/next/thuird/file.csv"                         
+## [16] "top/next/thuird/filename2.txt"                    
+## [17] "top/next/thuird/fourth/filename.txt"              
+## [18] "top/next/thuird/processed_data/fixed_rownames.txt"
 ```
 
 ```r
@@ -225,11 +255,17 @@ s3_ls(recursive = T, pattern = "\\/") # works as expected
 ```
 
 ```
-## [1] "processed_data/fixed_rownames.txt"               
-## [2] "top/next/third/file.csv"                         
-## [3] "top/next/third/filename2.txt"                    
-## [4] "top/next/third/fourth/filename.txt"              
-## [5] "top/next/third/processed_data/fixed_rownames.txt"
+##  [1] "processed_data2/fixed_rownames.txt"               
+##  [2] "processed_data3/fixed_rownames.txt"               
+##  [3] "top/next/filename.txt"                            
+##  [4] "top/next/third/file.csv"                          
+##  [5] "top/next/third/filename2.txt"                     
+##  [6] "top/next/third/fourth/filename.txt"               
+##  [7] "top/next/third/processed_data/fixed_rownames.txt" 
+##  [8] "top/next/thuird/file.csv"                         
+##  [9] "top/next/thuird/filename2.txt"                    
+## [10] "top/next/thuird/fourth/filename.txt"              
+## [11] "top/next/thuird/processed_data/fixed_rownames.txt"
 ```
 
 ```r
@@ -237,17 +273,24 @@ s3_ls(recursive = T, full.names = T)  # also works fine, almost better ;)
 ```
 
 ```
-##  [1] "s3://s3r-test-bucket/file.csv"                                        
-##  [2] "s3://s3r-test-bucket/file1.txt"                                       
-##  [3] "s3://s3r-test-bucket/file2.csv"                                       
-##  [4] "s3://s3r-test-bucket/file2.txt"                                       
-##  [5] "s3://s3r-test-bucket/file3.csv"                                       
-##  [6] "s3://s3r-test-bucket/file4.csv"                                       
-##  [7] "s3://s3r-test-bucket/processed_data/fixed_rownames.txt"               
-##  [8] "s3://s3r-test-bucket/top/next/third/file.csv"                         
-##  [9] "s3://s3r-test-bucket/top/next/third/filename2.txt"                    
-## [10] "s3://s3r-test-bucket/top/next/third/fourth/filename.txt"              
-## [11] "s3://s3r-test-bucket/top/next/third/processed_data/fixed_rownames.txt"
+##  [1] "s3://s3r-test-bucket//file1.txt"                                        
+##  [2] "s3://s3r-test-bucket//file2.csv"                                        
+##  [3] "s3://s3r-test-bucket//file2.txt"                                        
+##  [4] "s3://s3r-test-bucket//file3.csv"                                        
+##  [5] "s3://s3r-test-bucket//file4.csv"                                        
+##  [6] "s3://s3r-test-bucket//new_filename.txt"                                 
+##  [7] "s3://s3r-test-bucket//new_filename2.txt"                                
+##  [8] "s3://s3r-test-bucket//processed_data2/fixed_rownames.txt"               
+##  [9] "s3://s3r-test-bucket//processed_data3/fixed_rownames.txt"               
+## [10] "s3://s3r-test-bucket//top/next/filename.txt"                            
+## [11] "s3://s3r-test-bucket//top/next/third/file.csv"                          
+## [12] "s3://s3r-test-bucket//top/next/third/filename2.txt"                     
+## [13] "s3://s3r-test-bucket//top/next/third/fourth/filename.txt"               
+## [14] "s3://s3r-test-bucket//top/next/third/processed_data/fixed_rownames.txt" 
+## [15] "s3://s3r-test-bucket//top/next/thuird/file.csv"                         
+## [16] "s3://s3r-test-bucket//top/next/thuird/filename2.txt"                    
+## [17] "s3://s3r-test-bucket//top/next/thuird/fourth/filename.txt"              
+## [18] "s3://s3r-test-bucket//top/next/thuird/processed_data/fixed_rownames.txt"
 ```
 
 ```r
@@ -272,8 +315,10 @@ The function _**s3_get**_ suite of tools automatically save an s3 object to your
 ```
 ##                          bucket                           cache 
 ##          "s3://s3r-test-bucket"                             "." 
-##                             cwd                         profile 
-##          "s3://s3r-test-bucket" "--profile=s3r-read-write-user"
+##              create_command_log                             cwd 
+##                          "TRUE"          "s3://s3r-test-bucket" 
+##                         profile 
+## "--profile=s3r-read-write-user"
 ```
 
 ```r
@@ -295,7 +340,8 @@ s3_ls()
 ```
 
 ```
-## [1] "fourth/"         "processed_data/" "file.csv"        "filename2.txt"
+## [1] "PRE fourth/"         "PRE processed_data/" "file.csv"           
+## [4] "filename2.txt"
 ```
 
 ```r
@@ -354,6 +400,10 @@ s3_put_table(df, "processed_data/fixed_rownames.txt")
 ```
 
 ```
+## [1] "file written to: /tmp/s3-cache/fixed_rownames.txt"
+```
+
+```
 ## [1] "s3://s3r-test-bucket/top/next/third/processed_data/fixed_rownames.txt"
 ```
 
@@ -364,13 +414,14 @@ s3_ls(recursive = T, pattern = "third")
 ```
 
 ```
-## [1] "top/next/third/file.csv"                         
-## [2] "top/next/third/filename2.txt"                    
-## [3] "top/next/third/fourth/filename.txt"              
-## [4] "top/next/third/processed_data/fixed_rownames.txt"
+## [1] "file.csv"                          "filename2.txt"                    
+## [3] "fourth/filename.txt"               "processed_data/fixed_rownames.txt"
 ```
 
-#### TBD
-There are a couple of holes currently in this functionality, namely moving, copying, removing items from an s3 bucket. These are important, especially as you are learning to interact with a new bucket and need to move incorrectly placed things. I'm working on those now, just gimme a minute.
+#### Move, Copy and Sync
+This suite of functions operate similarly to listing functions above, however since from/to locations need to be distinguished you must wrap each path vector in a list. 
+
+#### TBD 
+There are a couple of holes, somwhat on purpose, but mainly because I haven't had the time to do them well. Namely removing items from an s3 bucket. If you're really in a pinch it can be accomplished by using the ```s3_mv()``` function along with the param ```allow.overwrite = T```.  
 
 Dan

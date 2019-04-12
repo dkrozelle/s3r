@@ -142,7 +142,10 @@ s3_put_table(df, "processed_data/fixed_rownames.txt")
 s3_ls(recursive = T, pattern = "third")
 ```
 
-#### TBD
-There are a couple of holes currently in this functionality, namely moving, copying, removing items from an s3 bucket. These are important, especially as you are learning to interact with a new bucket and need to move incorrectly placed things. I'm working on those now, just gimme a minute.
+#### Move, Copy and Sync
+This suite of functions operate similarly to listing functions above, however since from/to locations need to be distinguished you must wrap each path vector in a list. 
+
+#### TBD 
+There are a couple of holes, somwhat on purpose, but mainly because I haven't had the time to do them well. Namely removing items from an s3 bucket. If you're really in a pinch it can be accomplished by using the ```s3_mv()``` function along with the param ```allow.overwrite = T```.  
 
 Dan

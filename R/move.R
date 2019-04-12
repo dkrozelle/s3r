@@ -69,8 +69,8 @@ s3_sync <- function(from            = NULL,
   }else{
      cmd <- paste('aws s3',
                  verb,
-                 from.path,
-                 to.path,
+                 paste0('"',from.path,'"'),
+                 paste0('"',to.path,'"'),
                  s3e$sse,
                  s3e$aws.args,
                  aws.args)

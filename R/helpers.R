@@ -12,7 +12,7 @@ build_uri <- function(..., dir = F){
   # else warning
   
   path <- capture_path_args(...)
-  
+
   if( !is.na(path) && grepl("^s3:\\/\\/", path) ){
     path <- path
   }else if( !is.na(path) && check_vars("cwd") ){
@@ -55,7 +55,9 @@ aws_cli <- function(cmd){
   cmd  <- paste(cmd, s3e$aws.args, s3e$profile)
   cmd  <- gsub(" +", " ", cmd)
   
-  write(cmd, file=file.path(s3e$cache, "command.log"), append=TRUE)
+  if(s3e$create_command_log){
+    write(cmd, file=file.path(s3e$cache, "command.log"), append=TRUE)
+  }
   
   suppressWarnings(
     response <- system(cmd, intern = T)
@@ -87,7 +89,7 @@ check_vars <- function(...){
 valid_uri <- function(uri){
   Reduce("&", list( 
     grepl("^s3:\\/\\/", uri),     # starts with "s3://"
-    grepl("^[^ ]+$", uri),        # no spaces
+    # grepl("^[^ ]+$", uri),        # no spaces
     !grepl("\\/{2}.*\\/{2}", uri) # only one set of double "//"
   ))
 }
@@ -129,10 +131,10 @@ capture_path_args <- function(...){
 }
 
 
-path_exists <- function(path){
-  cmd <- paste('aws s3 ls', path)
+path_exists <- function(s3.path){
+  cmd <- paste('aws s3 ls', paste0('"',s3.path,'"'))
   response <- aws_cli(cmd)
-  
+
   if( any(response == 1) ){
     return(FALSE)
   }else{
