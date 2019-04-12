@@ -17,6 +17,8 @@
 #' @param aws.args character string of any additional values you need appended to an 
 #'           aws.cli command line call. This should likely be left blank and 
 #'           applied to individual calls where appropriate.
+#' @param create_command_log boolean, if True a file (command.log) will be created
+#'           in the working directory and appended with all aws command line calls.
 #'
 #' @return list, invisibly returns a list of environment variable settings
 #' @export
@@ -26,7 +28,8 @@ s3_set <- function(
   cache    = NULL,
   sse      = NULL,
   cwd      = NULL,
-  aws.args = NULL){
+  aws.args = NULL,
+  create_command_log = TRUE){
   
   if( !exists("s3e", envir = globalenv()) ) s3e <<- new.env(parent = emptyenv())
   
@@ -111,6 +114,8 @@ s3_set <- function(
   # for options like --dryrun mode we suggest setting these on individual calls
   # instead of here so they can be quickly removed  after you confirm proper usage
   if( !is.null(aws.args) ) s3e$aws.args <- aws.args
+  
+  if( !is.null(create_command_log) ) s3e$create_command_log <- create_command_log
   
 
   invisible(sapply(ls(s3e), function(x){s3e[[x]]}))
